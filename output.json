@@ -1,73 +1,68 @@
 {
-  "nextRace": {
-    "circuitId": "monaco",
-    "raceName": "Monaco Grand Prix",
-    "round": "8",
-    "season": "2025",
-    "circuitName": "Circuit de Monaco",
-    "location": {
-      "lat": "43.7347",
-      "long": "7.42056",
-      "locality": "Monte-Carlo",
-      "country": "Monaco"
-    },
-    "sessions": {
-      "firstPractice": "2025-05-23T11:30:00Z",
-      "secondPractice": "2025-05-23T15:00:00Z",
-      "thirdPractice": "2025-05-24T10:30:00Z",
-      "qualifying": "2025-05-24T14:00:00Z",
-      "race": "2025-05-25T13:00:00Z"
-    },
-    "weekendFormat": "regular"
+  "circuitId": "monaco",
+  "raceName": "Monaco Grand Prix",
+  "round": 8,
+  "season": 2025,
+  "circuitName": "Circuit de Monaco",
+  "location": {
+    "lat": "43.7347",
+    "long": "7.42056",
+    "locality": "Monte-Carlo",
+    "country": "Monaco"
   },
-  "historicalData": {
-    "circuitId": "monaco",
-    "resultsByYear": [
-      {
-        "year": 2015,
-        "winner": "Nico Rosberg",
-        "carsFinished": 17
-      },
-      {
-        "year": 2016,
-        "winner": "Lewis Hamilton",
-        "carsFinished": 15
-      },
-      {
-        "year": 2017,
-        "winner": "Sebastian Vettel",
-        "carsFinished": 13
-      },
-      {
-        "year": 2018,
-        "winner": "Daniel Ricciardo",
-        "carsFinished": 17
-      },
-      {
-        "year": 2019,
-        "winner": "Lewis Hamilton",
-        "carsFinished": 19
-      },
-      {
-        "year": 2021,
-        "winner": "Max Verstappen",
-        "carsFinished": 18
-      },
-      {
-        "year": 2022,
-        "winner": "Sergio Pérez",
-        "carsFinished": 17
-      },
-      {
-        "year": 2023,
-        "winner": "Max Verstappen",
-        "carsFinished": 19
-      },
-      {
-        "year": 2024,
-        "winner": "Charles Leclerc",
-        "carsFinished": 16
-      }
-    ]
-  }
+  "sessions": {
+    "firstPractice": "2025-05-23T11:30:00Z",
+    "secondPractice": "2025-05-23T15:00:00Z",
+    "thirdPractice": "2025-05-24T10:30:00Z",
+    "qualifying": "2025-05-24T14:00:00Z",
+    "race": "2025-05-25T13:00:00Z"
+  },
+  "weekendFormat": "regular",
+  "historicalData": [
+    {
+      "year": 2015,
+      "winner": "Nico Rosberg",
+      "carsFinished": 17
+    },
+    {
+      "year": 2016,
+      "winner": "Lewis Hamilton",
+      "carsFinished": 15
+    },
+    {
+      "year": 2017,
+      "winner": "Sebastian Vettel",
+      "carsFinished": 13
+    },
+    {
+      "year": 2018,
+      "winner": "Daniel Ricciardo",
+      "carsFinished": 17
+    },
+    {
+      "year": 2019,
+      "winner": "Lewis Hamilton",
+      "carsFinished": 19
+    },
+    {
+      "year": 2021,
+      "winner": "Max Verstappen",
+      "carsFinished": 18
+    },
+    {
+      "year": 2022,
+      "winner": "Sergio Pérez",
+      "carsFinished": 17
+    },
+    {
+      "year": 2023,
+      "winner": "Max Verstappen",
+      "carsFinished": 19
+    },
+    {
+      "year": 2024,
+      "winner": "Charles Leclerc",
+      "carsFinished": 16
+    }
+  ]
 }

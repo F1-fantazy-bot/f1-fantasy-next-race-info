@@ -7,10 +7,11 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Install app dependencies (if any were added in package.json)
-RUN npm install --omit=dev
+RUN npm install --omit=dev --ignore-scripts
 
 # Copy application source code
-COPY . .
+COPY index.js ./
+COPY src ./src
 
 # Command to run the application
 CMD ["node", "index.js"]
