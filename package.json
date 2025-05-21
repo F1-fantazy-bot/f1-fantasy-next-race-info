@@ -1,0 +1,21 @@
+{
+  "name": "f1-fantasy-next-race-info",
+  "version": "1.0.0",
+  "description": "Node.js application that fetches F1 race data and outputs it as JSON",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "keywords": [
+    "f1",
+    "formula1",
+    "racing",
+    "data"
+  ],
+  "author": "",
+  "license": "ISC"
+}
