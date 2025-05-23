@@ -20,47 +20,47 @@
   "weekendFormat": "regular",
   "historicalData": [
     {
-      "year": 2015,
+      "season": 2015,
       "winner": "Nico Rosberg",
       "carsFinished": 17
     },
     {
-      "year": 2016,
+      "season": 2016,
       "winner": "Lewis Hamilton",
       "carsFinished": 15
     },
     {
-      "year": 2017,
+      "season": 2017,
       "winner": "Sebastian Vettel",
       "carsFinished": 13
     },
     {
-      "year": 2018,
+      "season": 2018,
       "winner": "Daniel Ricciardo",
       "carsFinished": 17
     },
     {
-      "year": 2019,
+      "season": 2019,
       "winner": "Lewis Hamilton",
       "carsFinished": 19
     },
     {
-      "year": 2021,
+      "season": 2021,
       "winner": "Max Verstappen",
       "carsFinished": 18
     },
     {
-      "year": 2022,
+      "season": 2022,
       "winner": "Sergio Pérez",
       "carsFinished": 17
     },
     {
-      "year": 2023,
+      "season": 2023,
       "winner": "Max Verstappen",
       "carsFinished": 19
     },
     {
-      "year": 2024,
+      "season": 2024,
       "winner": "Charles Leclerc",
       "carsFinished": 16
     }

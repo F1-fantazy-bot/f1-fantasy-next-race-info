@@ -92,7 +92,7 @@ The application generates a JSON file (`output.json`) with the following structu
   "weekendFormat": "regular" | "sprint",
   "historicalData": [
     {
-      "year": number,
+      "season": number,
       "winner": "string",
       "carsFinished": number
     }

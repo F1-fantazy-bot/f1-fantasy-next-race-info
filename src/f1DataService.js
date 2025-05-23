@@ -107,7 +107,7 @@ async function fetchHistoricalResults(circuitId) {
         ).length;
 
         results.push({
-          year,
+          season: year,
           winner: winnerName,
           carsFinished: finishedCars,
         });
