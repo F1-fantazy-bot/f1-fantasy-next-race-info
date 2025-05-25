@@ -6,7 +6,7 @@ A Node.js application that fetches Formula 1 race information from multiple APIs
 
 - Fetches next race details (circuit info, session times, location)
 - Determines weekend format (regular/sprint)
-- Collects historical race data (winners and finishers) for the last decade
+- Collects historical race data (winners, finishers, safety car deployments, and red flags) for the last decade
 - Outputs structured JSON data to Azure Blob Storage
 - Logs the JSON output to the console
 - Runs in a containerized environment
@@ -154,7 +154,10 @@ The application generates a JSON file with the following structure (uploaded as 
     {
       "season": number,
       "winner": "string",
-      "carsFinished": number
+      "constructor": "string",
+      "carsFinished": number,
+      "safetyCars": number, // Optional
+      "redFlags": number    // Optional
     }
   ]
 }
@@ -168,70 +171,89 @@ Here's an example output for the Monaco Grand Prix:
 
 ```json
 {
-  "circuitId": "monaco",
-  "raceName": "Monaco Grand Prix",
-  "round": 8,
+  "circuitId": "catalunya",
+  "raceName": "Spanish Grand Prix",
+  "round": 9,
   "season": 2025,
-  "circuitName": "Circuit de Monaco",
+  "circuitName": "Circuit de Barcelona-Catalunya",
   "location": {
-    "lat": "43.7347",
-    "long": "7.42056",
-    "locality": "Monte-Carlo",
-    "country": "Monaco"
+    "lat": "41.57",
+    "long": "2.26111",
+    "locality": "Montmeló",
+    "country": "Spain"
   },
   "sessions": {
-    "firstPractice": "2025-05-23T11:30:00Z",
-    "secondPractice": "2025-05-23T15:00:00Z",
-    "thirdPractice": "2025-05-24T10:30:00Z",
-    "qualifying": "2025-05-24T14:00:00Z",
-    "race": "2025-05-25T13:00:00Z"
+    "firstPractice": "2025-05-30T11:30:00Z",
+    "secondPractice": "2025-05-30T15:00:00Z",
+    "thirdPractice": "2025-05-31T10:30:00Z",
+    "qualifying": "2025-05-31T14:00:00Z",
+    "race": "2025-06-01T13:00:00Z"
   },
   "weekendFormat": "regular",
   "historicalData": [
     {
-      "season": 2015,
-      "winner": "Nico Rosberg",
-      "carsFinished": 17
-    },
-    {
-      "season": 2016,
-      "winner": "Lewis Hamilton",
-      "carsFinished": 15
-    },
-    {
-      "season": 2017,
-      "winner": "Sebastian Vettel",
-      "carsFinished": 13
-    },
-    {
-      "season": 2018,
-      "winner": "Daniel Ricciardo",
-      "carsFinished": 17
-    },
-    {
-      "season": 2019,
-      "winner": "Lewis Hamilton",
-      "carsFinished": 19
-    },
-    {
-      "season": 2021,
+      "season": 2024,
       "winner": "Max Verstappen",
-      "carsFinished": 18
-    },
-    {
-      "season": 2022,
-      "winner": "Sergio Pérez",
-      "carsFinished": 17
+      "constructor": "Red Bull",
+      "carsFinished": 20,
+      "safetyCars": 0,
+      "redFlags": 0
     },
     {
       "season": 2023,
       "winner": "Max Verstappen",
+      "constructor": "Red Bull",
+      "carsFinished": 20,
+      "safetyCars": 0,
+      "redFlags": 0
+    },
+    {
+      "season": 2022,
+      "winner": "Max Verstappen",
+      "constructor": "Red Bull",
+      "carsFinished": 18
+    },
+    {
+      "season": 2021,
+      "winner": "Lewis Hamilton",
+      "constructor": "Mercedes",
       "carsFinished": 19
     },
     {
-      "season": 2024,
-      "winner": "Charles Leclerc",
+      "season": 2020,
+      "winner": "Lewis Hamilton",
+      "constructor": "Mercedes",
+      "carsFinished": 19
+    },
+    {
+      "season": 2019,
+      "winner": "Lewis Hamilton",
+      "constructor": "Mercedes",
+      "carsFinished": 18
+    },
+    {
+      "season": 2018,
+      "winner": "Lewis Hamilton",
+      "constructor": "Mercedes",
+      "carsFinished": 14
+    },
+    {
+      "season": 2017,
+      "winner": "Lewis Hamilton",
+      "constructor": "Mercedes",
       "carsFinished": 16
+    },
+    {
+      "season": 2016,
+      "winner": "Max Verstappen",
+      "constructor": "Red Bull",
+      "carsFinished": 17
+    },
+    {
+      "season": 2015,
+      "winner": "Nico Rosberg",
+      "constructor": "Mercedes",
+      "carsFinished": 18
     }
   ]
 }
@@ -242,6 +264,7 @@ Here's an example output for the Monaco Grand Prix:
 - `index.js` - Main application logic
 - `src/azureBlobStorageService.js` - Azure Blob Storage upload logic
 - `src/f1DataService.js` - F1 data fetching and processing
+  - Includes `fetchRaceInterruptionData` for safety car and red flag statistics
 - `package.json` - Project configuration
 - `Dockerfile` - Container configuration
 - `.dockerignore` - Docker build exclusions
