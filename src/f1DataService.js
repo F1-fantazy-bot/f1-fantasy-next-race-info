@@ -83,78 +83,34 @@ async function checkSprintWeekend(season, round) {
  * - Safety cars: Counts messages with category=SafetyCar containing "DEPLOYED" (case-insensitive).
  * - Red flags: Counts messages with flag=RED.
  */
+/**
+ * Fetches race interruption data from OpenF1 API
+ * @param {number} year - The year of the race
+ * @param {string} raceName - The name of the race
+ * @returns {Promise<{safetyCarDeployments: number|null, redFlags: number|null}>}
+ * @throws {Error} If year is invalid or raceName is empty
+ */
 async function fetchRaceInterruptionData(year, raceName) {
-  const meetingsUrl = `${OPENF1_API_BASE}/v1/meetings?meeting_name=${encodeURIComponent(raceName)}&year=${year}`;
-  let meetingKey = null;
-
-  try {
-    const meetingsResp = await fetch(meetingsUrl);
-    if (!meetingsResp.ok) return { safetyCarDeployments: null, redFlags: null };
-    const meetings = await meetingsResp.json();
-
-    // Normalize and match meeting_name to raceName
-    const meeting = meetings.find(
-      (m) =>
-        m.meeting_name &&
-        m.meeting_name.toLowerCase().includes(raceName.toLowerCase()),
-    );
-    if (!meeting) return { safetyCarDeployments: null, redFlags: null };
-    meetingKey = meeting.meeting_key;
-  } catch {
+  const meetingKey = await getMeetingKey(year, raceName);
+  if (!meetingKey) {
     return { safetyCarDeployments: null, redFlags: null };
   }
 
-  // Fetch session_key for the Race session
-  let sessionKey = null;
-  try {
-    const sessionUrl = `${OPENF1_API_BASE}/v1/sessions?meeting_key=${meetingKey}&session_name=Race`;
-    const sessionResp = await fetch(sessionUrl);
-    if (!sessionResp.ok) return { safetyCarDeployments: null, redFlags: null };
-    const sessions = await sessionResp.json();
-    if (!Array.isArray(sessions) || sessions.length === 0)
-      return { safetyCarDeployments: null, redFlags: null };
-    // Find the session with session_name === "Race"
-    const raceSession = sessions.find((s) => s.session_name === 'Race');
-    if (!raceSession || !raceSession.session_key)
-      return { safetyCarDeployments: null, redFlags: null };
-    sessionKey = raceSession.session_key;
-  } catch {
+  const sessionKey = await getSessionKey(meetingKey);
+  if (!sessionKey) {
     return { safetyCarDeployments: null, redFlags: null };
   }
 
-  // Fetch all Safety Car deployments (regular and virtual) by category only, using session_key
-  let safetyCarDeployments = 0;
-  try {
-    const scUrl = `${OPENF1_API_BASE}/v1/race_control?session_key=${sessionKey}&category=SafetyCar`;
-    const scResp = await fetch(scUrl);
-    if (scResp.ok) {
-      const scMsgs = await scResp.json();
-      safetyCarDeployments = scMsgs.filter(
-        (msg) => msg.message && msg.message.toUpperCase().includes('DEPLOYED'),
-      ).length;
-    } else {
-      safetyCarDeployments = null;
-    }
-  } catch (err) {
-    console.warn('Error fetching Safety Car deployments:', err);
-  }
+  const [safetyCarData, redFlagData] = await Promise.allSettled([
+    fetchSafetyCarData(sessionKey),
+    fetchRedFlagData(sessionKey),
+  ]);
 
-  // Fetch red flags using flag=RED
-  let redFlags = null;
-  try {
-    const rfUrl = `${OPENF1_API_BASE}/v1/race_control?session_key=${sessionKey}&flag=RED`;
-    const rfResp = await fetch(rfUrl);
-    if (rfResp.ok) {
-      const rfMsgs = await rfResp.json();
-      redFlags = Array.isArray(rfMsgs) ? rfMsgs.length : null;
-    } else {
-      redFlags = null;
-    }
-  } catch (err) {
-    console.warn('Error fetching Red Flags:', err);
-  }
-
-  return { safetyCarDeployments, redFlags };
+  return {
+    safetyCarDeployments:
+      safetyCarData.status === 'fulfilled' ? safetyCarData.value : null,
+    redFlags: redFlagData.status === 'fulfilled' ? redFlagData.value : null,
+  };
 }
 
 async function fetchHistoricalResults(circuitId) {
@@ -257,3 +213,83 @@ module.exports = {
   fetchAllF1Data,
   fetchRaceInterruptionData,
 };
+
+/**
+ * Helper function for API requests
+ * @private
+ */
+async function fetchWithErrorHandling(url) {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`API request failed: ${response.status}`);
+  }
+  return response.json();
+}
+
+/**
+ * Helper function to get meeting key from OpenF1 API
+ * @private
+ */
+async function getMeetingKey(year, raceName) {
+  try {
+    const url = `${OPENF1_API_BASE}/v1/meetings?meeting_name=${encodeURIComponent(raceName)}&year=${year}`;
+    const meetings = await fetchWithErrorHandling(url);
+    const meeting = meetings.find((m) =>
+      m.meeting_name?.toLowerCase().includes(raceName.toLowerCase()),
+    );
+    return meeting?.meeting_key || null;
+  } catch (error) {
+    console.warn('Error fetching meeting key:', error);
+    return null;
+  }
+}
+
+/**
+ * Helper function to get session key from OpenF1 API
+ * @private
+ */
+async function getSessionKey(meetingKey) {
+  try {
+    const url = `${OPENF1_API_BASE}/v1/sessions?meeting_key=${meetingKey}&session_name=Race`;
+    const sessions = await fetchWithErrorHandling(url);
+    if (!Array.isArray(sessions) || sessions.length === 0) return null;
+
+    const raceSession = sessions.find((s) => s.session_name === 'Race');
+    return raceSession?.session_key || null;
+  } catch (error) {
+    console.warn('Error fetching session key:', error);
+    return null;
+  }
+}
+
+/**
+ * Helper function to fetch safety car deployments
+ * @private
+ */
+async function fetchSafetyCarData(sessionKey) {
+  try {
+    const url = `${OPENF1_API_BASE}/v1/race_control?session_key=${sessionKey}&category=SafetyCar`;
+    const scMsgs = await fetchWithErrorHandling(url);
+    return scMsgs.filter((msg) =>
+      msg.message?.toUpperCase().includes('DEPLOYED'),
+    ).length;
+  } catch (error) {
+    console.warn('Error fetching Safety Car deployments:', error);
+    return null;
+  }
+}
+
+/**
+ * Helper function to fetch red flag data
+ * @private
+ */
+async function fetchRedFlagData(sessionKey) {
+  try {
+    const url = `${OPENF1_API_BASE}/v1/race_control?session_key=${sessionKey}&flag=RED`;
+    const rfMsgs = await fetchWithErrorHandling(url);
+    return Array.isArray(rfMsgs) ? rfMsgs.length : null;
+  } catch (error) {
+    console.warn('Error fetching Red Flags:', error);
+    return null;
+  }
+}
