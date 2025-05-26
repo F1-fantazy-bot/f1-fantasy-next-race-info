@@ -132,6 +132,8 @@ async function fetchRaceInterruptionData(year, raceName) {
       safetyCarDeployments = scMsgs.filter(
         (msg) => msg.message && msg.message.toUpperCase().includes('DEPLOYED'),
       ).length;
+    } else {
+      safetyCarDeployments = null;
     }
   } catch (err) {
     console.warn('Error fetching Safety Car deployments:', err);
@@ -145,6 +147,8 @@ async function fetchRaceInterruptionData(year, raceName) {
     if (rfResp.ok) {
       const rfMsgs = await rfResp.json();
       redFlags = Array.isArray(rfMsgs) ? rfMsgs.length : null;
+    } else {
+      redFlags = null;
     }
   } catch (err) {
     console.warn('Error fetching Red Flags:', err);
