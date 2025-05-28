@@ -196,7 +196,7 @@ async function fetchAllF1Data() {
     nextRaceData.season,
     nextRaceData.round,
   );
-  const historicalResults = await fetchHistoricalResults(
+  const historicalRaceStats = await fetchHistoricalResults(
     nextRaceData.circuitId,
   );
 
@@ -215,8 +215,7 @@ async function fetchAllF1Data() {
   return {
     ...nextRaceData,
     weekendFormat,
-    // todo: kilzi: change it to historicalResults
-    historicalData: historicalResults,
+    historicalRaceStats,
     trackHistory,
   };
 }

@@ -128,38 +128,92 @@ The application generates a JSON file with the following structure (uploaded as 
 
 ```json
 {
-  "circuitId": "string",
-  "raceName": "string",
-  "round": number,
-  "season": number,
-  "circuitName": "string",
-  "location": {
-    "lat": "string",
-    "long": "string",
-    "locality": "string",
-    "country": "string"
+  circuitId: "catalunya",
+  raceName: "Spanish Grand Prix",
+  round: 9,
+  season: 2025,
+  circuitName: "Circuit de Barcelona-Catalunya",
+  location: {
+    lat: "41.57",
+    long: "2.26111",
+    locality: "Montmeló",
+    country: "Spain",
   },
-  "sessions": {
-    "firstPractice": "ISO-8601 datetime string",
-    "qualifying": "ISO-8601 datetime string",
-    "race": "ISO-8601 datetime string"
-    // Optional sessions (only included when applicable):
-    // "secondPractice": "ISO-8601 datetime string",
-    // "thirdPractice": "ISO-8601 datetime string",
-    // "sprint": "ISO-8601 datetime string",
-    // "sprintQualifying": "ISO-8601 datetime string"
+  sessions: {
+    firstPractice: "2025-05-30T11:30:00Z",
+    secondPractice: "2025-05-30T15:00:00Z",
+    thirdPractice: "2025-05-31T10:30:00Z",
+    qualifying: "2025-05-31T14:00:00Z",
+    race: "2025-06-01T13:00:00Z",
   },
-  "weekendFormat": "regular" | "sprint",
-  "historicalData": [
+  weekendFormat: "regular",
+  historicalRaceStats: [
     {
-      "season": number,
-      "winner": "string",
-      "constructor": "string",
-      "carsFinished": number,
-      "safetyCars": number, // Optional
-      "redFlags": number    // Optional
-    }
-  ]
+      season: 2024,
+      winner: "Max Verstappen",
+      constructor: "Red Bull",
+      carsFinished: 20,
+      safetyCars: 0,
+      redFlags: 0,
+    },
+    {
+      season: 2023,
+      winner: "Max Verstappen",
+      constructor: "Red Bull",
+      carsFinished: 20,
+      safetyCars: 0,
+      redFlags: 0,
+    },
+    {
+      season: 2022,
+      winner: "Max Verstappen",
+      constructor: "Red Bull",
+      carsFinished: 18,
+    },
+    {
+      season: 2021,
+      winner: "Lewis Hamilton",
+      constructor: "Mercedes",
+      carsFinished: 19,
+    },
+    {
+      season: 2020,
+      winner: "Lewis Hamilton",
+      constructor: "Mercedes",
+      carsFinished: 19,
+    },
+    {
+      season: 2019,
+      winner: "Lewis Hamilton",
+      constructor: "Mercedes",
+      carsFinished: 18,
+    },
+    {
+      season: 2018,
+      winner: "Lewis Hamilton",
+      constructor: "Mercedes",
+      carsFinished: 14,
+    },
+    {
+      season: 2017,
+      winner: "Lewis Hamilton",
+      constructor: "Mercedes",
+      carsFinished: 16,
+    },
+    {
+      season: 2016,
+      winner: "Max Verstappen",
+      constructor: "Red Bull",
+      carsFinished: 17,
+    },
+    {
+      season: 2015,
+      winner: "Nico Rosberg",
+      constructor: "Mercedes",
+      carsFinished: 18,
+    },
+  ],
+  trackHistory: "The Circuit de Barcelona-Catalunya, located in Montmeló, Spain, was inaugurated on September 10, 1991, just ahead of its debut hosting the Spanish Grand Prix that same year. Its establishment coincided with preparations for the 1992 Barcelona Olympics, reflecting Spain’s growing investment in international sporting events. Since its introduction to the Formula 1 calendar, the circuit has become a mainstay, celebrated for its technical complexity and the crucial role it plays in pre-season testing due to its mix of long straights, high-speed corners, and slow technical sections. The circuit has undergone several notable modifications over the years, most significantly in 2007 with the addition of a slow chicane before the final corner to improve safety and overtaking possibilities, and later in 2023, when the original fast final two corners were reinstated, restoring a key challenge for drivers and increasing the speed on the main straight. Over the decades, the Spanish Grand Prix at this track has delivered numerous memorable moments, including Michael Schumacher’s heroic 1996 victory in torrential rain—widely regarded as one of his finest performances—and Fernando Alonso’s emotional win in 2006, becoming the first Spanish driver to win his home Grand Prix. The circuit has also been the scene of dramatic duels, such as the infamous collision between Nico Rosberg and Lewis Hamilton on the opening lap in 2016, which handed a maiden victory to Max Verstappen, making him the youngest race winner in F1 history at just 18. Its high-speed layout, taxing on tires and aerodynamics, has made it a proving ground for both cars and drivers, with legends like Ayrton Senna, Alain Prost, and Nigel Mansell all experiencing memorable battles here. The Circuit de Barcelona-Catalunya remains historically significant for its continuous influence on vehicle development and its role as a venue where champions are both tested and made.",
 }
 ```
 
@@ -190,7 +244,7 @@ Here's an example output for the Monaco Grand Prix:
     "race": "2025-06-01T13:00:00Z"
   },
   "weekendFormat": "regular",
-  "historicalData": [
+  "historicalRaceStats": [
     {
       "season": 2024,
       "winner": "Max Verstappen",
