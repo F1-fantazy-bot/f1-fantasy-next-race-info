@@ -73,9 +73,6 @@ Please provide historical information about this Formula 1 circuit.`;
     const response = await client.chat.completions.create({
       model: AZURE_OPEN_AI_MODEL,
       messages: messages,
-      // max_tokens: 400,
-      // temperature: 0.3,
-      // top_p: 0.9,
     });
 
     const azureOpenAiTokensString = `Azure OpenAI model - ${AZURE_OPEN_AI_MODEL}, tokens - prompt: ${response.usage.prompt_tokens}, completion: ${response.usage.completion_tokens}, total: ${response.usage.total_tokens}`;
