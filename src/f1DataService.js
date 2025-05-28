@@ -2,6 +2,7 @@
 
 const JOLPI_API_BASE = 'https://api.jolpi.ca/ergast/f1';
 const OPENF1_API_BASE = 'https://api.openf1.org';
+const { getTrackHistoricalInfo } = require('./azureOpenAiService');
 
 async function fetchNextRaceData() {
   try {
@@ -199,10 +200,24 @@ async function fetchAllF1Data() {
     nextRaceData.circuitId,
   );
 
+  // Get track historical information using Azure OpenAI
+  let trackHistory = null;
+  try {
+    trackHistory = await getTrackHistoricalInfo(
+      nextRaceData.circuitName,
+      nextRaceData.raceName,
+      nextRaceData.location,
+    );
+  } catch (error) {
+    console.warn('Failed to get track historical information:', error);
+  }
+
   return {
     ...nextRaceData,
     weekendFormat,
+    // todo: kilzi: change it to historicalResults
     historicalData: historicalResults,
+    trackHistory,
   };
 }
 
