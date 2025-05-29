@@ -3,6 +3,7 @@
 const JOLPI_API_BASE = 'https://api.jolpi.ca/ergast/f1';
 const OPENF1_API_BASE = 'https://api.openf1.org';
 const { getTrackHistoricalInfo } = require('./azureOpenAiService');
+const { getSheetRaceName } = require('./raceNameMapping');
 
 async function fetchNextRaceData() {
   try {
@@ -114,6 +115,92 @@ async function fetchRaceInterruptionData(year, raceName) {
   };
 }
 
+/**
+ * Fetches overtake data from the Google Sheet CSV for a specific year and race
+ * @param {number} year - The year of the race
+ * @param {string} sheetRaceName - The race name as it appears in the Google Sheet
+ * @returns {Promise<number|null>} - The number of overtakes, or null if not found
+ */
+async function fetchOvertakeData(year, sheetRaceName) {
+  if (!year || !sheetRaceName) {
+    return null;
+  }
+
+  try {
+    const sheetId = '1XueNI7ZawEX0RLDq5dAGVqsEb1-DBOK2kUWGwM1OMKs';
+    const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
+
+    const response = await fetch(csvUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch overtake data: ${response.status}`);
+    }
+
+    const csvText = await response.text();
+    const lines = csvText
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line);
+
+    if (lines.length === 0) {
+      return null;
+    }
+
+    // Parse CSV header to find column indices
+    const headers = lines[0]
+      .split(',')
+      .map((header) => header.trim().replace(/"/g, ''));
+    const yearIndex = headers.findIndex(
+      (h) =>
+        h.toLowerCase().includes('year') || h.toLowerCase().includes('season'),
+    );
+    const raceIndex = headers.findIndex(
+      (h) =>
+        h.toLowerCase().includes('race') ||
+        h.toLowerCase().includes('grand prix') ||
+        h.toLowerCase().includes('gp'),
+    );
+    const overtakeIndex = headers.findIndex((h) =>
+      h.toLowerCase().includes('overtake'),
+    );
+
+    if (yearIndex === -1 || raceIndex === -1 || overtakeIndex === -1) {
+      console.warn('Could not find required columns in overtake data sheet');
+      return null;
+    }
+
+    // Search for matching row
+    for (let i = 1; i < lines.length; i++) {
+      const cells = lines[i]
+        .split(',')
+        .map((cell) => cell.trim().replace(/"/g, ''));
+
+      if (cells.length <= Math.max(yearIndex, raceIndex, overtakeIndex)) {
+        continue; // Skip incomplete rows
+      }
+
+      const rowYear = parseInt(cells[yearIndex], 10);
+      const rowRace = cells[raceIndex];
+
+      if (
+        rowYear === year &&
+        rowRace &&
+        rowRace.toLowerCase().includes(sheetRaceName.toLowerCase())
+      ) {
+        const overtakes = parseInt(cells[overtakeIndex], 10);
+        return isNaN(overtakes) ? null : overtakes;
+      }
+    }
+
+    return null; // No matching data found
+  } catch (error) {
+    console.warn(
+      `Failed to fetch overtake data for ${year} ${sheetRaceName}:`,
+      error,
+    );
+    return null;
+  }
+}
+
 async function fetchHistoricalResults(circuitId) {
   try {
     const currentYear = new Date().getFullYear();
@@ -148,6 +235,8 @@ async function fetchHistoricalResults(circuitId) {
         // Fetch total SC/VSC deployments from OpenF1 using year and raceName
         let safetyCarDeployments = null;
         let redFlags = null;
+        let overtakes = null;
+
         if (race.raceName) {
           try {
             const interruptionData = await fetchRaceInterruptionData(
@@ -159,6 +248,21 @@ async function fetchHistoricalResults(circuitId) {
           } catch (err) {
             console.warn(
               `Failed to fetch race interruption data for ${year} ${race.raceName}`,
+            );
+          }
+
+          // Fetch overtake data using race name mapping
+          try {
+            const sheetRaceName = getSheetRaceName(race.raceName);
+            if (sheetRaceName) {
+              overtakes = await fetchOvertakeData(year, sheetRaceName);
+            } else {
+              console.warn(`No race name mapping found for: ${race.raceName}`);
+            }
+          } catch (err) {
+            console.warn(
+              `Failed to fetch overtake data for ${year} ${race.raceName}:`,
+              err,
             );
           }
         }
@@ -177,6 +281,9 @@ async function fetchHistoricalResults(circuitId) {
         }
         if (redFlags !== null && redFlags !== undefined) {
           resultObj.redFlags = redFlags;
+        }
+        if (overtakes !== null && overtakes !== undefined) {
+          resultObj.overtakes = overtakes;
         }
         results.push(resultObj);
       }
@@ -226,6 +333,7 @@ module.exports = {
   fetchHistoricalResults,
   fetchAllF1Data,
   fetchRaceInterruptionData,
+  fetchOvertakeData,
 };
 
 /**
