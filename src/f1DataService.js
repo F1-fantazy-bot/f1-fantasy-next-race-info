@@ -149,18 +149,14 @@ async function fetchOvertakeData(year, sheetRaceName) {
     const headers = lines[0]
       .split(',')
       .map((header) => header.trim().replace(/"/g, ''));
-    const yearIndex = headers.findIndex(
-      (h) =>
-        h.toLowerCase().includes('year') || h.toLowerCase().includes('season'),
+    const yearIndex = headers.findIndex((h) =>
+      h.toLowerCase().includes('season'),
     );
-    const raceIndex = headers.findIndex(
-      (h) =>
-        h.toLowerCase().includes('race') ||
-        h.toLowerCase().includes('grand prix') ||
-        h.toLowerCase().includes('gp'),
+    const raceIndex = headers.findIndex((h) =>
+      h.toLowerCase().includes('race'),
     );
     const overtakeIndex = headers.findIndex((h) =>
-      h.toLowerCase().includes('overtake'),
+      h.toLowerCase().includes('overtakes'),
     );
 
     if (yearIndex === -1 || raceIndex === -1 || overtakeIndex === -1) {
