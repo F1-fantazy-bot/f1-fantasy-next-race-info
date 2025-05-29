@@ -6,7 +6,7 @@ A Node.js application that fetches Formula 1 race information from multiple APIs
 
 - Fetches next race details (circuit info, session times, location)
 - Determines weekend format (regular/sprint)
-- Collects historical race data (winners, finishers, safety car deployments, red flags, and overtakes) for the last decade
+- Collects historical race data (winners, pole positions, podium finishers, safety car deployments, red flags, and overtakes) for the last decade
 - Integrates overtake data from external Google Sheets source
 - Outputs structured JSON data to Azure Blob Storage
 - Logs the JSON output to the console
@@ -184,6 +184,12 @@ The application generates a JSON file with the following structure (uploaded as 
       "season": 2024,
       "winner": "Max Verstappen",
       "constructor": "Red Bull",
+      "polePosition": "Lando Norris",
+      "poleConstructor": "McLaren",
+      "secondPlaceDriver": "Lando Norris",
+      "secondPlaceConstructor": "McLaren",
+      "thirdPlaceDriver": "Lewis Hamilton",
+      "thirdPlaceConstructor": "Mercedes",
       "carsFinished": 20,
       "safetyCars": 0,
       "redFlags": 0,
@@ -193,6 +199,12 @@ The application generates a JSON file with the following structure (uploaded as 
       "season": 2023,
       "winner": "Max Verstappen",
       "constructor": "Red Bull",
+      "polePosition": "Max Verstappen",
+      "poleConstructor": "Red Bull",
+      "secondPlaceDriver": "Lewis Hamilton",
+      "secondPlaceConstructor": "Mercedes",
+      "thirdPlaceDriver": "George Russell",
+      "thirdPlaceConstructor": "Mercedes",
       "carsFinished": 20,
       "safetyCars": 0,
       "redFlags": 0,
@@ -202,6 +214,12 @@ The application generates a JSON file with the following structure (uploaded as 
       "season": 2022,
       "winner": "Max Verstappen",
       "constructor": "Red Bull",
+      "polePosition": "Charles Leclerc",
+      "poleConstructor": "Ferrari",
+      "secondPlaceDriver": "Sergio Pérez",
+      "secondPlaceConstructor": "Red Bull",
+      "thirdPlaceDriver": "George Russell",
+      "thirdPlaceConstructor": "Mercedes",
       "carsFinished": 18,
       "overtakes": 48
     },
@@ -209,6 +227,12 @@ The application generates a JSON file with the following structure (uploaded as 
       "season": 2021,
       "winner": "Lewis Hamilton",
       "constructor": "Mercedes",
+      "polePosition": "Lewis Hamilton",
+      "poleConstructor": "Mercedes",
+      "secondPlaceDriver": "Max Verstappen",
+      "secondPlaceConstructor": "Red Bull",
+      "thirdPlaceDriver": "Valtteri Bottas",
+      "thirdPlaceConstructor": "Mercedes",
       "carsFinished": 19,
       "overtakes": 51
     },
@@ -216,6 +240,12 @@ The application generates a JSON file with the following structure (uploaded as 
       "season": 2020,
       "winner": "Lewis Hamilton",
       "constructor": "Mercedes",
+      "polePosition": "Lewis Hamilton",
+      "poleConstructor": "Mercedes",
+      "secondPlaceDriver": "Max Verstappen",
+      "secondPlaceConstructor": "Red Bull",
+      "thirdPlaceDriver": "Valtteri Bottas",
+      "thirdPlaceConstructor": "Mercedes",
       "carsFinished": 19,
       "overtakes": 32
     },
@@ -223,6 +253,12 @@ The application generates a JSON file with the following structure (uploaded as 
       "season": 2019,
       "winner": "Lewis Hamilton",
       "constructor": "Mercedes",
+      "polePosition": "Valtteri Bottas",
+      "poleConstructor": "Mercedes",
+      "secondPlaceDriver": "Valtteri Bottas",
+      "secondPlaceConstructor": "Mercedes",
+      "thirdPlaceDriver": "Max Verstappen",
+      "thirdPlaceConstructor": "Red Bull",
       "carsFinished": 18,
       "overtakes": 26
     },
@@ -230,6 +266,12 @@ The application generates a JSON file with the following structure (uploaded as 
       "season": 2018,
       "winner": "Lewis Hamilton",
       "constructor": "Mercedes",
+      "polePosition": "Lewis Hamilton",
+      "poleConstructor": "Mercedes",
+      "secondPlaceDriver": "Valtteri Bottas",
+      "secondPlaceConstructor": "Mercedes",
+      "thirdPlaceDriver": "Max Verstappen",
+      "thirdPlaceConstructor": "Red Bull",
       "carsFinished": 14,
       "overtakes": 13
     },
@@ -237,6 +279,12 @@ The application generates a JSON file with the following structure (uploaded as 
       "season": 2017,
       "winner": "Lewis Hamilton",
       "constructor": "Mercedes",
+      "polePosition": "Lewis Hamilton",
+      "poleConstructor": "Mercedes",
+      "secondPlaceDriver": "Sebastian Vettel",
+      "secondPlaceConstructor": "Ferrari",
+      "thirdPlaceDriver": "Daniel Ricciardo",
+      "thirdPlaceConstructor": "Red Bull",
       "carsFinished": 16,
       "overtakes": 20
     },
@@ -244,6 +292,12 @@ The application generates a JSON file with the following structure (uploaded as 
       "season": 2016,
       "winner": "Max Verstappen",
       "constructor": "Red Bull",
+      "polePosition": "Lewis Hamilton",
+      "poleConstructor": "Mercedes",
+      "secondPlaceDriver": "Kimi Räikkönen",
+      "secondPlaceConstructor": "Ferrari",
+      "thirdPlaceDriver": "Sebastian Vettel",
+      "thirdPlaceConstructor": "Ferrari",
       "carsFinished": 17,
       "overtakes": 54
     },
@@ -251,109 +305,49 @@ The application generates a JSON file with the following structure (uploaded as 
       "season": 2015,
       "winner": "Nico Rosberg",
       "constructor": "Mercedes",
+      "polePosition": "Nico Rosberg",
+      "poleConstructor": "Mercedes",
+      "secondPlaceDriver": "Lewis Hamilton",
+      "secondPlaceConstructor": "Mercedes",
+      "thirdPlaceDriver": "Sebastian Vettel",
+      "thirdPlaceConstructor": "Ferrari",
       "carsFinished": 18,
       "overtakes": 30
     }
   ],
-  "trackHistory": "The Circuit de Barcelona-Catalunya, situated in Montmeló, Spain, was inaugurated on September 10, 1991, and has since served as the primary venue for the Spanish Grand Prix in Formula 1. Designed with input from renowned circuit architect Hermann Tilke (for later revisions) and Spanish engineer Josep Casanovas, the circuit’s original 4.747-kilometer layout swiftly replaced Jerez as the home of the Spanish Grand Prix from 1991 onward. One of the most significant modifications came in 2007, when a tight chicane was added before the final corner in an effort to enhance overtaking opportunities and improve safety, fundamentally altering the approach to the main straight. The track’s technical combination of high- and low-speed corners, along with its abrasive surface, has made it a critical venue for pre-season testing, shaping car development and strategy over decades. The circuit’s storied history includes the rain-soaked 1996 Spanish Grand Prix, where a young Michael Schumacher claimed his first Ferrari victory in a masterful display, and the infamous 2016 race that saw Mercedes teammates Lewis Hamilton and Nico Rosberg collide on the opening lap, paving the way for Max Verstappen to become the youngest-ever F1 race winner at just 18 years old. Legendary figures such as Ayrton Senna, Mika Hakkinen, Fernando Alonso—who electrified home crowds with a stunning victory in 2006—and Lewis Hamilton have all left their mark here. Its long, sweeping corners, particularly Turn 3 (Renault), test driver skill and car balance, establishing the circuit as a historical benchmark for technical excellence and racing drama in Formula 1."
+  "trackHistory": "The Circuit de Barcelona-Catalunya, located in Montmeló, Spain, has been a cornerstone of Formula 1 since its inauguration in September 1991, hosting its first Spanish Grand Prix that same year. Originally constructed as part of the preparations for the 1992 Summer Olympics, the circuit replaced the historic Jarama and Jerez circuits as the new home of F1 in Spain. Designed with a mix of high-speed straights and technical corners, the 4.657-kilometer layout has seen several modifications over the decades, most notably the addition of a chicane before the final corner in 2007 to improve safety—a feature revised in 2023 with a return to the original fast layout for better racing. The circuit's demanding nature and abrasive surface quickly made it a favorite for pre-season testing, offering teams a comprehensive assessment of car performance. Legendary moments abound, such as Nigel Mansell and Ayrton Senna’s dramatic wheel-to-wheel duel down the main straight in 1991, Fernando Alonso’s emotional maiden victory in 2006—cementing his hero status in Spain—and Max Verstappen’s historic 2016 win, making him the youngest Grand Prix winner in F1 history. The venue has played a pivotal role in the careers of Michael Schumacher, who secured multiple victories here, and Lewis Hamilton, whose dominant performances were key to his championship successes. Circuit de Barcelona-Catalunya is renowned for its variable weather conditions and significant tire wear, challenging even the best drivers, and remains a fixture in Formula 1, celebrated for its technical demands and as a proving ground for champions."
 }
 ```
 
 Note: The `sessions` object only includes sessions that are scheduled for the race weekend. Sessions that don't exist for a particular weekend format are omitted from the output rather than showing as null.
 
-### Example Output
+## Historical Race Data Fields
 
-Here's an example output for the Monaco Grand Prix:
+The `historicalRaceStats` array includes comprehensive race data for each year over the last decade:
 
-```json
-{
-  "circuitId": "catalunya",
-  "raceName": "Spanish Grand Prix",
-  "round": 9,
-  "season": 2025,
-  "circuitName": "Circuit de Barcelona-Catalunya",
-  "location": {
-    "lat": "41.57",
-    "long": "2.26111",
-    "locality": "Montmeló",
-    "country": "Spain"
-  },
-  "sessions": {
-    "firstPractice": "2025-05-30T11:30:00Z",
-    "secondPractice": "2025-05-30T15:00:00Z",
-    "thirdPractice": "2025-05-31T10:30:00Z",
-    "qualifying": "2025-05-31T14:00:00Z",
-    "race": "2025-06-01T13:00:00Z"
-  },
-  "weekendFormat": "regular",
-  "historicalRaceStats": [
-    {
-      "season": 2024,
-      "winner": "Max Verstappen",
-      "constructor": "Red Bull",
-      "carsFinished": 20,
-      "safetyCars": 0,
-      "redFlags": 0
-    },
-    {
-      "season": 2023,
-      "winner": "Max Verstappen",
-      "constructor": "Red Bull",
-      "carsFinished": 20,
-      "safetyCars": 0,
-      "redFlags": 0
-    },
-    {
-      "season": 2022,
-      "winner": "Max Verstappen",
-      "constructor": "Red Bull",
-      "carsFinished": 18
-    },
-    {
-      "season": 2021,
-      "winner": "Lewis Hamilton",
-      "constructor": "Mercedes",
-      "carsFinished": 19
-    },
-    {
-      "season": 2020,
-      "winner": "Lewis Hamilton",
-      "constructor": "Mercedes",
-      "carsFinished": 19
-    },
-    {
-      "season": 2019,
-      "winner": "Lewis Hamilton",
-      "constructor": "Mercedes",
-      "carsFinished": 18
-    },
-    {
-      "season": 2018,
-      "winner": "Lewis Hamilton",
-      "constructor": "Mercedes",
-      "carsFinished": 14
-    },
-    {
-      "season": 2017,
-      "winner": "Lewis Hamilton",
-      "constructor": "Mercedes",
-      "carsFinished": 16
-    },
-    {
-      "season": 2016,
-      "winner": "Max Verstappen",
-      "constructor": "Red Bull",
-      "carsFinished": 17
-    },
-    {
-      "season": 2015,
-      "winner": "Nico Rosberg",
-      "constructor": "Mercedes",
-      "carsFinished": 18
-    }
-  ]
-}
-```
+### Core Race Results
+
+- `season`: The year of the race
+- `winner`: Full name of the race winner
+- `constructor`: Constructor/team of the winning driver
+- `carsFinished`: Number of cars that finished the race (including those that completed but weren't on the lead lap)
+
+### Qualifying and Podium Results
+
+- `polePosition`: Full name of the driver who started from pole position (grid position 1)
+- `poleConstructor`: Constructor/team of the pole position driver
+- `secondPlaceDriver`: Full name of the driver who finished 2nd in the race
+- `secondPlaceConstructor`: Constructor/team of the 2nd place driver
+- `thirdPlaceDriver`: Full name of the driver who finished 3rd in the race
+- `thirdPlaceConstructor`: Constructor/team of the 3rd place driver
+
+### Race Interruptions and Statistics
+
+- `safetyCars`: Number of safety car deployments (including virtual safety cars) during the race
+- `redFlags`: Number of red flag periods during the race
+- `overtakes`: Total number of overtakes during the race (from external Google Sheets data)
+
+Note: Some fields may be `null` if data is not available for specific races/years.
 
 ## Project Structure
 

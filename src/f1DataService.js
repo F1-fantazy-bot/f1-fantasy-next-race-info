@@ -222,6 +222,21 @@ async function fetchHistoricalResults(circuitId) {
         const winnerName = `${winner.givenName} ${winner.familyName}`;
         const constructor = race.Results[0].Constructor.name;
 
+        // Get pole position (driver with grid position "1")
+        const poleSitter = race.Results.find((result) => result.grid === '1');
+        const polePosition = `${poleSitter.Driver.givenName} ${poleSitter.Driver.familyName}`;
+        const poleConstructor = poleSitter.Constructor.name;
+
+        // Get 2nd place finisher
+        const secondPlace = race.Results[1];
+        const secondPlaceDriver = `${secondPlace.Driver.givenName} ${secondPlace.Driver.familyName}`;
+        const secondPlaceConstructor = secondPlace.Constructor.name;
+
+        // Get 3rd place finisher
+        const thirdPlace = race.Results[2];
+        const thirdPlaceDriver = `${thirdPlace.Driver.givenName} ${thirdPlace.Driver.familyName}`;
+        const thirdPlaceConstructor = thirdPlace.Constructor.name;
+
         // Count finished cars (including those that completed the race but weren't on the lead lap)
         const finishedCars = race.Results.filter(
           (result) =>
@@ -267,6 +282,12 @@ async function fetchHistoricalResults(circuitId) {
           season: year,
           winner: winnerName,
           constructor,
+          polePosition,
+          poleConstructor,
+          secondPlaceDriver,
+          secondPlaceConstructor,
+          thirdPlaceDriver,
+          thirdPlaceConstructor,
           carsFinished: finishedCars,
         };
         if (
