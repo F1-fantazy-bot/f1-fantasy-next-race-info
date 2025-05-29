@@ -6,7 +6,8 @@ A Node.js application that fetches Formula 1 race information from multiple APIs
 
 - Fetches next race details (circuit info, session times, location)
 - Determines weekend format (regular/sprint)
-- Collects historical race data (winners, finishers, safety car deployments, and red flags) for the last decade
+- Collects historical race data (winners, finishers, safety car deployments, red flags, and overtakes) for the last decade
+- Integrates overtake data from external Google Sheets source
 - Outputs structured JSON data to Azure Blob Storage
 - Logs the JSON output to the console
 - Runs in a containerized environment
@@ -74,6 +75,33 @@ The application will:
 - If you use the Telegram service to send messages to other chat IDs, the prefix will not be added.
 - The Telegram integration uses the [`node-telegram-bot-api`](https://www.npmjs.com/package/node-telegram-bot-api) package.
 
+## Overtake Data Integration
+
+The application integrates overtake statistics from an external Google Sheets data source to enhance historical race analysis.
+
+### How It Works
+
+1. **Race Name Mapping**: The [`src/raceNameMapping.js`](src/raceNameMapping.js) module provides a static mapping between race names from the Jolpi.ca API (e.g., "Italian Grand Prix") and the corresponding names in the Google Sheet (e.g., "Italy").
+
+2. **Data Fetching**: The [`fetchOvertakeData()`](src/f1DataService.js) function fetches overtake data directly from the Google Sheet in CSV format and parses it to find matching year and race combinations.
+
+3. **Integration**: Overtake counts are automatically included in the historical race statistics alongside existing data (winners, constructors, safety cars, red flags, etc.).
+
+### Supported Race Mappings
+
+The mapping includes 30+ races covering:
+
+- **European Races**: Italian GP → Italy, British GP → Great Britain, Spanish GP → Spain, etc.
+- **Americas**: United States GP → USA, Brazilian GP → Brazil, Canadian GP → Canada, etc.
+- **Asia-Pacific**: Japanese GP → Japan, Australian GP → Australia, Singapore GP → Singapore, etc.
+- **Special Cases**: Styrian GP → Austria, Emilia Romagna GP → Emilia-Romagna, etc.
+
+### Error Handling
+
+- Graceful handling when overtake data is unavailable for specific races/years
+- Robust CSV parsing with proper handling of quoted fields
+- Network error resilience with warning logs for debugging
+
 ## API Endpoints Used
 
 1. Next Race Data:
@@ -87,6 +115,10 @@ The application will:
 3. Historical Results:
    ```
    https://api.jolpi.ca/ergast/f1/{year}/circuits/{circuitId}/results.json
+   ```
+4. Overtake Data:
+   ```
+   https://docs.google.com/spreadsheets/d/1XueNI7ZawEX0RLDq5dAGVqsEb1-DBOK2kUWGwM1OMKs/export?format=csv
    ```
 
 ## Application Flow
@@ -154,7 +186,8 @@ The application generates a JSON file with the following structure (uploaded as 
       "constructor": "Red Bull",
       "carsFinished": 20,
       "safetyCars": 0,
-      "redFlags": 0
+      "redFlags": 0,
+      "overtakes": 55
     },
     {
       "season": 2023,
@@ -162,58 +195,67 @@ The application generates a JSON file with the following structure (uploaded as 
       "constructor": "Red Bull",
       "carsFinished": 20,
       "safetyCars": 0,
-      "redFlags": 0
+      "redFlags": 0,
+      "overtakes": 65
     },
     {
       "season": 2022,
       "winner": "Max Verstappen",
       "constructor": "Red Bull",
-      "carsFinished": 18
+      "carsFinished": 18,
+      "overtakes": 48
     },
     {
       "season": 2021,
       "winner": "Lewis Hamilton",
       "constructor": "Mercedes",
-      "carsFinished": 19
+      "carsFinished": 19,
+      "overtakes": 51
     },
     {
       "season": 2020,
       "winner": "Lewis Hamilton",
       "constructor": "Mercedes",
-      "carsFinished": 19
+      "carsFinished": 19,
+      "overtakes": 32
     },
     {
       "season": 2019,
       "winner": "Lewis Hamilton",
       "constructor": "Mercedes",
-      "carsFinished": 18
+      "carsFinished": 18,
+      "overtakes": 26
     },
     {
       "season": 2018,
       "winner": "Lewis Hamilton",
       "constructor": "Mercedes",
-      "carsFinished": 14
+      "carsFinished": 14,
+      "overtakes": 13
     },
     {
       "season": 2017,
       "winner": "Lewis Hamilton",
       "constructor": "Mercedes",
-      "carsFinished": 16
+      "carsFinished": 16,
+      "overtakes": 20
     },
     {
       "season": 2016,
       "winner": "Max Verstappen",
       "constructor": "Red Bull",
-      "carsFinished": 17
+      "carsFinished": 17,
+      "overtakes": 54
     },
     {
       "season": 2015,
       "winner": "Nico Rosberg",
       "constructor": "Mercedes",
-      "carsFinished": 18
+      "carsFinished": 18,
+      "overtakes": 30
     }
   ],
-  "trackHistory": "The Circuit de Barcelona-Catalunya, located in Montmeló, Spain, was inaugurated on September 10, 1991, just ahead of its debut hosting the Spanish Grand Prix that same year. Its establishment coincided with preparations for the 1992 Barcelona Olympics, reflecting Spain’s growing investment in international sporting events. Since its introduction to the Formula 1 calendar, the circuit has become a mainstay, celebrated for its technical complexity and the crucial role it plays in pre-season testing due to its mix of long straights, high-speed corners, and slow technical sections. The circuit has undergone several notable modifications over the years, most significantly in 2007 with the addition of a slow chicane before the final corner to improve safety and overtaking possibilities, and later in 2023, when the original fast final two corners were reinstated, restoring a key challenge for drivers and increasing the speed on the main straight. Over the decades, the Spanish Grand Prix at this track has delivered numerous memorable moments, including Michael Schumacher’s heroic 1996 victory in torrential rain—widely regarded as one of his finest performances—and Fernando Alonso’s emotional win in 2006, becoming the first Spanish driver to win his home Grand Prix. The circuit has also been the scene of dramatic duels, such as the infamous collision between Nico Rosberg and Lewis Hamilton on the opening lap in 2016, which handed a maiden victory to Max Verstappen, making him the youngest race winner in F1 history at just 18. Its high-speed layout, taxing on tires and aerodynamics, has made it a proving ground for both cars and drivers, with legends like Ayrton Senna, Alain Prost, and Nigel Mansell all experiencing memorable battles here. The Circuit de Barcelona-Catalunya remains historically significant for its continuous influence on vehicle development and its role as a venue where champions are both tested and made."
+  "trackHistory": "The Circuit de Barcelona-Catalunya, situated in Montmeló, Spain, was inaugurated on September 10, 1991, and has since served as the primary venue for the Spanish Grand Prix in Formula 1. Designed with input from renowned circuit architect Hermann Tilke (for later revisions) and Spanish engineer Josep Casanovas, the circuit’s original 4.747-kilometer layout swiftly replaced Jerez as the home of the Spanish Grand Prix from 1991 onward. One of the most significant modifications came in 2007, when a tight chicane was added before the final corner in an effort to enhance overtaking opportunities and improve safety, fundamentally altering the approach to the main straight. The track’s technical combination of high- and low-speed corners, along with its abrasive surface, has made it a critical venue for pre-season testing, shaping car development and strategy over decades. The circuit’s storied history includes the rain-soaked 1996 Spanish Grand Prix, where a young Michael Schumacher claimed his first Ferrari victory in a masterful display, and the infamous 2016 race that saw Mercedes teammates Lewis Hamilton and Nico Rosberg collide on the opening lap, paving the way for Max Verstappen to become the youngest-ever F1 race winner at just 18 years old. Legendary figures such as Ayrton Senna, Mika Hakkinen, Fernando Alonso—who electrified home crowds with a stunning victory in 2006—and Lewis Hamilton have all left their mark here. Its long, sweeping corners, particularly Turn 3 (Renault), test driver skill and car balance, establishing the circuit as a historical benchmark for technical excellence and racing drama in Formula 1."
 }
 ```
 
@@ -319,6 +361,8 @@ Here's an example output for the Monaco Grand Prix:
 - `src/azureBlobStorageService.js` - Azure Blob Storage upload logic
 - `src/f1DataService.js` - F1 data fetching and processing
   - Includes `fetchRaceInterruptionData` for safety car and red flag statistics
+  - Includes `fetchOvertakeData` for overtake statistics from Google Sheets
+- `src/raceNameMapping.js` - Race name mapping between Jolpi.ca and Google Sheets format
 - `package.json` - Project configuration
 - `Dockerfile` - Container configuration
 - `.dockerignore` - Docker build exclusions
