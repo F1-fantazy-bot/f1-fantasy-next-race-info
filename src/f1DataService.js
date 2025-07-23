@@ -3,6 +3,12 @@
 const JOLPI_API_BASE = 'https://api.jolpi.ca/ergast/f1';
 const OPENF1_API_BASE = 'https://api.openf1.org';
 const { getTrackHistoricalInfo } = require('./azureOpenAiService');
+
+// Languages supported for track history generation
+const SUPPORTED_LANGUAGES = [
+  { code: 'en', name: 'English' },
+  { code: 'he', name: 'Hebrew' },
+];
 const { getSheetRaceName } = require('./raceNameMapping');
 
 async function fetchNextRaceData() {
@@ -325,13 +331,19 @@ async function fetchAllF1Data() {
   );
 
   // Get track historical information using Azure OpenAI
-  let trackHistory = null;
+  const trackHistory = [];
   try {
-    trackHistory = await getTrackHistoricalInfo(
-      nextRaceData.circuitName,
-      nextRaceData.raceName,
-      nextRaceData.location,
-    );
+    for (const { code, name } of SUPPORTED_LANGUAGES) {
+      const history = await getTrackHistoricalInfo(
+        nextRaceData.circuitName,
+        nextRaceData.raceName,
+        nextRaceData.location,
+        name,
+      );
+      if (history) {
+        trackHistory.push({ lang: code, text: history });
+      }
+    }
   } catch (error) {
     console.warn('Failed to get track historical information:', error);
   }
