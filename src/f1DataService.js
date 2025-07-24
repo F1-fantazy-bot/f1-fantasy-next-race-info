@@ -54,27 +54,10 @@ async function fetchNextRaceData() {
         country: race.Circuit.Location.country,
       },
       sessions,
+      weekendFormat: race.Sprint ? 'sprint' : 'regular',
     };
   } catch (error) {
     console.error('Error fetching next race data:', error);
-    throw error;
-  }
-}
-
-async function checkSprintWeekend(season, round) {
-  try {
-    const response = await fetch(
-      `${JOLPI_API_BASE}/${season}/${round}/sprint.json`,
-    );
-    if (!response.ok) {
-      throw new Error(`Failed to fetch sprint data: ${response.status}`);
-    }
-    const data = await response.json();
-
-    // Return "sprint" for sprint weekends, "regular" for normal weekends
-    return data.MRData.RaceTable.Races.length > 0 ? 'sprint' : 'regular';
-  } catch (error) {
-    console.error('Error checking sprint weekend:', error);
     throw error;
   }
 }
@@ -316,10 +299,6 @@ async function fetchHistoricalResults(circuitId) {
 
 async function fetchAllF1Data() {
   const nextRaceData = await fetchNextRaceData();
-  const weekendFormat = await checkSprintWeekend(
-    nextRaceData.season,
-    nextRaceData.round,
-  );
   const historicalRaceStats = await fetchHistoricalResults(
     nextRaceData.circuitId,
   );
@@ -338,7 +317,6 @@ async function fetchAllF1Data() {
 
   return {
     ...nextRaceData,
-    weekendFormat,
     historicalRaceStats,
     trackHistory,
   };
@@ -346,7 +324,6 @@ async function fetchAllF1Data() {
 
 module.exports = {
   fetchNextRaceData,
-  checkSprintWeekend,
   fetchHistoricalResults,
   fetchAllF1Data,
   fetchRaceInterruptionData,
