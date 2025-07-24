@@ -8,6 +8,7 @@ A Node.js application that fetches Formula 1 race information from multiple APIs
 - Determines weekend format (regular/sprint)
 - Collects historical race data (winners, pole positions, podium finishers, safety car deployments, red flags, and overtakes) for the last decade
 - Integrates overtake data from external Google Sheets source
+- Generates track history in English and Hebrew using Azure OpenAI (stored as a list of `{lang, text}` objects)
 - Outputs structured JSON data to Azure Blob Storage
 - Logs the JSON output to the console
 - Runs in a containerized environment
@@ -315,7 +316,16 @@ The application generates a JSON file with the following structure (uploaded as 
       "overtakes": 30
     }
   ],
-  "trackHistory": "The Circuit de Barcelona-Catalunya, located in Montmeló, Spain, has been a cornerstone of Formula 1 since its inauguration in September 1991, hosting its first Spanish Grand Prix that same year. Originally constructed as part of the preparations for the 1992 Summer Olympics, the circuit replaced the historic Jarama and Jerez circuits as the new home of F1 in Spain. Designed with a mix of high-speed straights and technical corners, the 4.657-kilometer layout has seen several modifications over the decades, most notably the addition of a chicane before the final corner in 2007 to improve safety—a feature revised in 2023 with a return to the original fast layout for better racing. The circuit's demanding nature and abrasive surface quickly made it a favorite for pre-season testing, offering teams a comprehensive assessment of car performance. Legendary moments abound, such as Nigel Mansell and Ayrton Senna’s dramatic wheel-to-wheel duel down the main straight in 1991, Fernando Alonso’s emotional maiden victory in 2006—cementing his hero status in Spain—and Max Verstappen’s historic 2016 win, making him the youngest Grand Prix winner in F1 history. The venue has played a pivotal role in the careers of Michael Schumacher, who secured multiple victories here, and Lewis Hamilton, whose dominant performances were key to his championship successes. Circuit de Barcelona-Catalunya is renowned for its variable weather conditions and significant tire wear, challenging even the best drivers, and remains a fixture in Formula 1, celebrated for its technical demands and as a proving ground for champions."
+  "trackHistory": [
+    {
+      "lang": "en",
+      "text": "The Circuit de Barcelona-Catalunya, located in Montmeló, Spain, has been a cornerstone of Formula 1 since its inauguration in September 1991, hosting its first Spanish Grand Prix"
+    },
+    {
+      "lang": "he",
+      "text": "מסלול דה ברצלונה-קטלוניה ממוקם במונמלו שבספרד ומארח את הגרנד פרי הספרדי מאז 1991. המסלול ידוע באופ"
+    }
+  ]
 }
 ```
 

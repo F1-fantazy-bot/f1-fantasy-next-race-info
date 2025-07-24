@@ -47,9 +47,15 @@ async function initializeClient() {
  * @param {string} circuitName - Name of the circuit
  * @param {string} raceName - Name of the race
  * @param {Object} location - Location object with locality and country
+ * @param {string} [language='English'] - Desired language for the response
  * @returns {Promise<string|null>} Historical information as a string, or null if failed
  */
-async function getTrackHistoricalInfo(circuitName, raceName, location) {
+async function getTrackHistoricalInfo(
+  circuitName,
+  raceName,
+  location,
+  language = 'English',
+) {
   try {
     await initializeClient();
 
@@ -57,7 +63,7 @@ async function getTrackHistoricalInfo(circuitName, raceName, location) {
 Race: ${raceName}
 Location: ${location.locality}, ${location.country}
 
-Please provide historical information about this Formula 1 circuit.`;
+Please provide historical information about this Formula 1 circuit in ${language}.`;
 
     const messages = [
       {
