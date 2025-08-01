@@ -5,6 +5,7 @@ A Node.js application that fetches Formula 1 race information from multiple APIs
 ## Features
 
 - Fetches next race details (circuit info, session times, location)
+- Retrieves the circuit image URL from Wikipedia
 - Determines weekend format (regular/sprint)
 - Collects historical race data (winners, pole positions, podium finishers, safety car deployments, red flags, and overtakes) for the last decade
 - Integrates overtake data from external Google Sheets source
@@ -166,6 +167,7 @@ The application generates a JSON file with the following structure (uploaded as 
   "round": 9,
   "season": 2025,
   "circuitName": "Circuit de Barcelona-Catalunya",
+  "circuitImageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/65/Circuit_de_Barcelona-Catalunya_layout.svg",
   "location": {
     "lat": "41.57",
     "long": "2.26111",
