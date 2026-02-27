@@ -1,0 +1,176 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "containerGroupName": {
+      "type": "string",
+      "defaultValue": "f1-fantasy-next-race-info-aci",
+      "metadata": {
+        "description": "Name of the Azure Container Instance container group."
+      }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Azure region for the container group."
+      }
+    },
+    "containerImage": {
+      "type": "string",
+      "defaultValue": "f1fantasyacr.azurecr.io/f1-fantasy-next-race-info:latest",
+      "metadata": {
+        "description": "Container image to run in ACI."
+      }
+    },
+    "cpu": {
+      "type": "string",
+      "defaultValue": "1",
+      "metadata": {
+        "description": "Number of vCPUs assigned to the container (for example: 0.5, 1, 1.5, 2)."
+      }
+    },
+    "memoryInGb": {
+      "type": "string",
+      "defaultValue": "1.5",
+      "metadata": {
+        "description": "Amount of memory (GB) assigned to the container (for example: 1, 1.5, 2)."
+      }
+    },
+    "restartPolicy": {
+      "type": "string",
+      "defaultValue": "OnFailure",
+      "allowedValues": [
+        "Always",
+        "OnFailure",
+        "Never"
+      ],
+      "metadata": {
+        "description": "Container restart policy. Use OnFailure for this one-shot workload."
+      }
+    },
+    "acrServer": {
+      "type": "string",
+      "defaultValue": "f1fantasyacr.azurecr.io",
+      "metadata": {
+        "description": "Azure Container Registry login server."
+      }
+    },
+    "acrUsername": {
+      "type": "string",
+      "defaultValue": "f1fantasyacr",
+      "metadata": {
+        "description": "Azure Container Registry username."
+      }
+    },
+    "acrPassword": {
+      "type": "secureString",
+      "metadata": {
+        "description": "Azure Container Registry password."
+      }
+    },
+    "azureStorageConnectionString": {
+      "type": "secureString",
+      "metadata": {
+        "description": "Azure Storage connection string used by the app."
+      }
+    },
+    "azureStorageContainerName": {
+      "type": "string",
+      "defaultValue": "f1-fantasy-scraper-json",
+      "metadata": {
+        "description": "Blob container name where next-race-info.json will be uploaded."
+      }
+    },
+    "telegramBotToken": {
+      "type": "secureString",
+      "metadata": {
+        "description": "Telegram bot token for status notifications."
+      }
+    },
+    "azureOpenAiEndpoint": {
+      "type": "secureString",
+      "metadata": {
+        "description": "Azure OpenAI endpoint URL."
+      }
+    },
+    "azureOpenAiApiKey": {
+      "type": "secureString",
+      "metadata": {
+        "description": "Azure OpenAI API key."
+      }
+    },
+    "azureOpenAiModel": {
+      "type": "string",
+      "defaultValue": "gpt-5-chat",
+      "metadata": {
+        "description": "Azure OpenAI deployment/model name."
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.ContainerInstance/containerGroups",
+      "apiVersion": "2023-05-01",
+      "name": "[parameters('containerGroupName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "osType": "Linux",
+        "restartPolicy": "[parameters('restartPolicy')]",
+        "containers": [
+          {
+            "name": "[parameters('containerGroupName')]",
+            "properties": {
+              "image": "[parameters('containerImage')]",
+              "resources": {
+                "requests": {
+                  "cpu": "[json(parameters('cpu'))]",
+                  "memoryInGB": "[json(parameters('memoryInGb'))]"
+                }
+              },
+              "environmentVariables": [
+                {
+                  "name": "AZURE_STORAGE_CONTAINER_NAME",
+                  "value": "[parameters('azureStorageContainerName')]"
+                },
+                {
+                  "name": "AZURE_OPEN_AI_MODEL",
+                  "value": "[parameters('azureOpenAiModel')]"
+                },
+                {
+                  "name": "AZURE_OPENAI_ENDPOINT",
+                  "secureValue": "[parameters('azureOpenAiEndpoint')]"
+                },
+                {
+                  "name": "AZURE_STORAGE_CONNECTION_STRING",
+                  "secureValue": "[parameters('azureStorageConnectionString')]"
+                },
+                {
+                  "name": "TELEGRAM_BOT_TOKEN",
+                  "secureValue": "[parameters('telegramBotToken')]"
+                },
+                {
+                  "name": "AZURE_OPENAI_API_KEY",
+                  "secureValue": "[parameters('azureOpenAiApiKey')]"
+                }
+              ]
+            }
+          }
+        ],
+        "imageRegistryCredentials": [
+          {
+            "server": "[parameters('acrServer')]",
+            "username": "[parameters('acrUsername')]",
+            "password": "[parameters('acrPassword')]"
+          }
+        ]
+      }
+    }
+  ],
+  "outputs": {
+    "containerGroupResourceId": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.ContainerInstance/containerGroups', parameters('containerGroupName'))]"
+    }
+  }
+}

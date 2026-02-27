@@ -58,6 +58,88 @@ The application will:
 - Upload the output as `next-race-info.json` to your Azure Blob Storage container
 - Print the formatted JSON to the console
 
+## Deploy to Azure Container Instances (ARM)
+
+Use the ARM template in [`infra/aci/azuredeploy.json`](infra/aci/azuredeploy.json) to deploy this container as a one-shot workload in ACI.
+
+Note: this app is not an HTTP server, so the template does not expose public ports.
+
+### 1. Build and push the container image to ACR
+
+```bash
+az acr login --name <acr-name>
+docker build -t <acr-login-server>/f1-fantasy-next-race-info:latest .
+docker push <acr-login-server>/f1-fantasy-next-race-info:latest
+```
+
+### 2. Create (or reuse) a resource group
+
+```bash
+az group create --name <resource-group> --location <location>
+```
+
+### 3. Configure Key Vault for template secret references
+
+Enable Key Vault for ARM template deployments:
+
+```bash
+az keyvault update \
+  --name <keyvault-name> \
+  --resource-group <keyvault-resource-group> \
+  --enabled-for-template-deployment true
+```
+
+Grant the deployment identity `get` access to Key Vault secrets (for example via `Key Vault Secrets User` role on the vault scope).
+
+### 4. Prepare template parameters
+
+Update `infra/aci/azuredeploy.parameters.json` with your non-secret values plus Key Vault secret references.
+
+Edit:
+
+- `containerGroupName`
+- `location`
+- `containerImage`
+- `acrServer`
+- `acrUsername`
+- `azureStorageContainerName`
+- `azureOpenAiModel`
+- `acrPassword.reference`
+- `azureStorageConnectionString.reference`
+- `telegramBotToken.reference`
+- `azureOpenAiApiKey.reference`
+- `azureOpenAiEndpoint.reference`
+
+### 5. Deploy the ARM template
+
+```bash
+az deployment group create \
+  --resource-group <resource-group> \
+  --template-file infra/aci/azuredeploy.json \
+  --parameters @infra/aci/azuredeploy.parameters.json
+```
+
+### 6. Check run status and logs
+
+```bash
+az container show \
+  --resource-group <resource-group> \
+  --name <container-group-name> \
+  --query "containers[0].instanceView.currentState"
+
+az container logs \
+  --resource-group <resource-group> \
+  --name <container-group-name>
+```
+
+If `restartPolicy` is `OnFailure`, the container will stop after a successful run. To run it again:
+
+```bash
+az container restart \
+  --resource-group <resource-group> \
+  --name <container-group-name>
+```
+
 ## Azure Blob Storage Integration
 
 - The output JSON is uploaded to Azure Blob Storage using the [`src/azureBlobStorageService.js`](src/azureBlobStorageService.js:1) module.
