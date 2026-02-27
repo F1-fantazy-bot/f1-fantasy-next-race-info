@@ -40,11 +40,7 @@
     "restartPolicy": {
       "type": "string",
       "defaultValue": "OnFailure",
-      "allowedValues": [
-        "Always",
-        "OnFailure",
-        "Never"
-      ],
+      "allowedValues": ["Always", "OnFailure", "Never"],
       "metadata": {
         "description": "Container restart policy. Use OnFailure for this one-shot workload."
       }
