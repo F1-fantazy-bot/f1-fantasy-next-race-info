@@ -3,6 +3,9 @@
 const JOLPI_API_BASE = 'https://api.jolpi.ca/ergast/f1';
 const OPENF1_API_BASE = 'https://api.openf1.org';
 const { getTrackHistoricalInfo } = require('./azureOpenAiService');
+const MIN_RACE_INTERRUPTION_YEAR = 2023;
+const OPENF1_REQUEST_DELAY_MS = 2500;
+const OPENF1_429_RETRY_DELAY_MS = 5000;
 
 async function fetchCircuitImage(wikipediaUrl) {
   if (!wikipediaUrl) return null;
@@ -118,15 +121,9 @@ async function fetchRaceInterruptionData(year, raceName) {
     return { safetyCarDeployments: null, redFlags: null };
   }
 
-  const [safetyCarData, redFlagData] = await Promise.allSettled([
-    fetchSafetyCarData(sessionKey),
-    fetchRedFlagData(sessionKey),
-  ]);
-
   return {
-    safetyCarDeployments:
-      safetyCarData.status === 'fulfilled' ? safetyCarData.value : null,
-    redFlags: redFlagData.status === 'fulfilled' ? redFlagData.value : null,
+    safetyCarDeployments: await fetchSafetyCarData(sessionKey),
+    redFlags: await fetchRedFlagData(sessionKey),
   };
 }
 
@@ -264,17 +261,19 @@ async function fetchHistoricalResults(circuitId) {
         let overtakes = null;
 
         if (race.raceName) {
-          try {
-            const interruptionData = await fetchRaceInterruptionData(
-              year,
-              race.raceName,
-            );
-            safetyCarDeployments = interruptionData.safetyCarDeployments;
-            redFlags = interruptionData.redFlags;
-          } catch (err) {
-            console.warn(
-              `Failed to fetch race interruption data for ${year} ${race.raceName}`,
-            );
+          if (year >= MIN_RACE_INTERRUPTION_YEAR) {
+            try {
+              const interruptionData = await fetchRaceInterruptionData(
+                year,
+                race.raceName,
+              );
+              safetyCarDeployments = interruptionData.safetyCarDeployments;
+              redFlags = interruptionData.redFlags;
+            } catch (err) {
+              console.warn(
+                `Failed to fetch race interruption data for ${year} ${race.raceName}`,
+              );
+            }
           }
 
           // Fetch overtake data using race name mapping
@@ -374,11 +373,23 @@ module.exports = {
  * @private
  */
 async function fetchWithErrorHandling(url) {
-  const response = await fetch(url);
+  await sleep(OPENF1_REQUEST_DELAY_MS);
+
+  let response = await fetch(url);
+  if (response.status === 429) {
+    await sleep(OPENF1_429_RETRY_DELAY_MS);
+    response = await fetch(url);
+  }
+
   if (!response.ok) {
     throw new Error(`API request failed: ${response.status}`);
   }
+
   return response.json();
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
