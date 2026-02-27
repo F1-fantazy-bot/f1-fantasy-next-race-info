@@ -4,7 +4,7 @@ const JOLPI_API_BASE = 'https://api.jolpi.ca/ergast/f1';
 const OPENF1_API_BASE = 'https://api.openf1.org';
 const { getTrackHistoricalInfo } = require('./azureOpenAiService');
 const MIN_RACE_INTERRUPTION_YEAR = 2023;
-const OPENF1_REQUEST_DELAY_MS = 2000;
+const OPENF1_REQUEST_DELAY_MS = 2500;
 const OPENF1_429_RETRY_DELAY_MS = 5000;
 
 async function fetchCircuitImage(wikipediaUrl) {
