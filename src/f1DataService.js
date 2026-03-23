@@ -3,32 +3,10 @@
 const JOLPI_API_BASE = 'https://api.jolpi.ca/ergast/f1';
 const OPENF1_API_BASE = 'https://api.openf1.org';
 const { getTrackHistoricalInfo } = require('./azureOpenAiService');
+const { fetchCircuitImage } = require('./wikipediaCircuitImageService');
 const MIN_RACE_INTERRUPTION_YEAR = 2023;
 const OPENF1_REQUEST_DELAY_MS = 2500;
 const OPENF1_429_RETRY_DELAY_MS = 5000;
-
-async function fetchCircuitImage(wikipediaUrl) {
-  if (!wikipediaUrl) return null;
-
-  try {
-    const pageTitle = wikipediaUrl.split('/wiki/')[1];
-    if (!pageTitle) return null;
-
-    const apiUrl = `https://en.wikipedia.org/w/api.php?action=query&titles=${pageTitle}&prop=pageimages&format=json&pithumbsize=1000`;
-    const response = await fetch(apiUrl);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch circuit image: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const pages = data.query?.pages;
-    const firstPage = pages ? pages[Object.keys(pages)[0]] : null;
-    return firstPage?.thumbnail?.source || null;
-  } catch (err) {
-    console.warn('Failed to fetch circuit image:', err);
-    return null;
-  }
-}
 
 // Languages supported for track history generation
 const SUPPORTED_LANGUAGES = [
@@ -365,7 +343,6 @@ module.exports = {
   fetchAllF1Data,
   fetchRaceInterruptionData,
   fetchOvertakeData,
-  fetchCircuitImage,
 };
 
 /**
