@@ -3,6 +3,7 @@
 const TelegramBot = require('node-telegram-bot-api');
 
 const LOG_CHANNEL_ID = '-1002298860617';
+const ERRORS_CHANNEL_ID = '-5167373779';
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 
 let bot = null;
@@ -14,7 +15,7 @@ if (TELEGRAM_BOT_TOKEN) {
 
 /**
  * Sends a message to a Telegram chat.
- * If the chat is the log channel, adds the NEXT_RACE_INFO prefix.
+ * If the chat is a channel, adds the NEXT_RACE_INFO prefix.
  * @param {string} messageText - The message to send.
  * @param {string} [chatIdOverride] - Optional chat ID to send to (defaults to LOG_CHANNEL_ID).
  * @returns {Promise<void>}
@@ -28,7 +29,9 @@ async function sendTelegramMessage(
     return;
   }
   let finalMessage = messageText;
-  if (chatIdOverride === LOG_CHANNEL_ID) {
+  const isChannelMessage =
+    chatIdOverride === LOG_CHANNEL_ID || chatIdOverride === ERRORS_CHANNEL_ID;
+  if (isChannelMessage) {
     finalMessage = 'NEXT_RACE_INFO: ' + messageText;
   }
   try {
@@ -38,4 +41,14 @@ async function sendTelegramMessage(
   }
 }
 
-module.exports = { sendTelegramMessage, LOG_CHANNEL_ID };
+async function sendTelegramErrorMessage(messageText) {
+  await sendTelegramMessage(messageText, LOG_CHANNEL_ID);
+  await sendTelegramMessage(messageText, ERRORS_CHANNEL_ID);
+}
+
+module.exports = {
+  sendTelegramMessage,
+  sendTelegramErrorMessage,
+  LOG_CHANNEL_ID,
+  ERRORS_CHANNEL_ID,
+};

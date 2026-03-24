@@ -1,6 +1,6 @@
 const WIKIPEDIA_API_BASE = 'https://en.wikipedia.org/w/api.php';
 const CIRCUIT_IMAGE_WIDTH = '1000';
-const { sendTelegramMessage } = require('./telegramService');
+const { sendTelegramErrorMessage } = require('./telegramService');
 
 async function fetchCircuitImage(wikipediaUrl) {
   if (!wikipediaUrl) return null;
@@ -35,7 +35,7 @@ async function fetchCircuitImage(wikipediaUrl) {
 }
 
 async function notifyCircuitImageFetchFailure(wikipediaUrl, reason) {
-  await sendTelegramMessage(
+  await sendTelegramErrorMessage(
     `Warning: Failed to fetch circuit image URL for ${wikipediaUrl}. Reason: ${reason}`,
   );
 }

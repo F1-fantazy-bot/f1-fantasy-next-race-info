@@ -3,7 +3,10 @@
 require('dotenv').config();
 const { fetchAllF1Data } = require('./src/f1DataService');
 const { uploadJsonToBlob } = require('./src/azureBlobStorageService');
-const { sendTelegramMessage } = require('./src/telegramService');
+const {
+  sendTelegramMessage,
+  sendTelegramErrorMessage,
+} = require('./src/telegramService');
 
 async function main() {
   try {
@@ -20,7 +23,7 @@ async function main() {
     console.log(jsonString); // Log JSON to console
     console.log(`Race data uploaded to Azure Blob Storage as ${blobName}`);
   } catch (error) {
-    await sendTelegramMessage(
+    await sendTelegramErrorMessage(
       `❌ Failed to upload race data to Azure Blob Storage. Error: ${error.message}`,
     );
     console.error('Application error:', error);
