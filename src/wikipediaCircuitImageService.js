@@ -1,4 +1,5 @@
 const WIKIPEDIA_API_BASE = 'https://en.wikipedia.org/w/api.php';
+const CIRCUIT_IMAGE_WIDTH = '1000';
 const { sendTelegramMessage } = require('./telegramService');
 
 async function fetchCircuitImage(wikipediaUrl) {
@@ -114,11 +115,12 @@ async function fetchWikipediaImageUrl(imageName) {
     titles: `File:${imageName}`,
     prop: 'imageinfo',
     iiprop: 'url',
+    iiurlwidth: CIRCUIT_IMAGE_WIDTH,
     redirects: '1',
   });
 
   const firstPage = getFirstWikipediaQueryPage(data);
-  return firstPage?.imageinfo?.[0]?.url || null;
+  return firstPage?.imageinfo?.[0]?.thumburl || null;
 }
 
 async function fetchWikipediaThumbnail(pageTitle) {

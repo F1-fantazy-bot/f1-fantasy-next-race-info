@@ -9,11 +9,11 @@ const serviceModulePath = require.resolve(
 const SUZUKA_URL =
   'https://en.wikipedia.org/wiki/Suzuka_International_Racing_Course';
 const SUZUKA_IMAGE_URL =
-  'https://upload.wikimedia.org/wikipedia/commons/e/ec/Suzuka_circuit_map--2005.svg';
+  'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Suzuka_circuit_map--2005.svg/1000px-Suzuka_circuit_map--2005.svg.png';
 const BARCELONA_URL =
   'https://en.wikipedia.org/wiki/Circuit_de_Barcelona-Catalunya';
 const BARCELONA_IMAGE_URL =
-  'https://upload.wikimedia.org/wikipedia/commons/2/26/Formula1_Circuit_Catalunya_2021.svg';
+  'https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Formula1_Circuit_Catalunya_2021.svg/1000px-Formula1_Circuit_Catalunya_2021.svg.png';
 const MONACO_URL = 'https://en.wikipedia.org/wiki/Circuit_de_Monaco';
 const MONACO_IMAGE_URL =
   'https://upload.wikimedia.org/wikipedia/commons/3/36/Monte_Carlo_Formula_1_track_map.svg';
@@ -78,7 +78,7 @@ test('returns the infobox image URL for a real circuit page URL', async () => {
       query: {
         pages: {
           1: {
-            imageinfo: [{ url: SUZUKA_IMAGE_URL }],
+            imageinfo: [{ thumburl: SUZUKA_IMAGE_URL }],
           },
         },
       },
@@ -107,7 +107,7 @@ test('falls back to track_map when the infobox image is missing', async () => {
       query: {
         pages: {
           1: {
-            imageinfo: [{ url: BARCELONA_IMAGE_URL }],
+            imageinfo: [{ thumburl: BARCELONA_IMAGE_URL }],
           },
         },
       },
