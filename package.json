@@ -8,7 +8,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "start": "node index.js",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "deploy:aci": "az deployment group create --resource-group f1-fantazy-bot --name \"next-race-aci-${DEPLOYMENT_SUFFIX:-manual-$(date +%s)}\" --template-file infra/aci/azuredeploy.json --parameters @infra/aci/azuredeploy.parameters.json --output none --only-show-errors"
   },
   "engines": {
     "node": ">=20.0.0"
