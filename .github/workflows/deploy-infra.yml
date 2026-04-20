@@ -4,10 +4,14 @@ on:
   push:
     branches: ['main']
     paths:
-      - 'infra/**'
-      - 'package.json'
+      - 'infra/aci/**'
       - '.github/workflows/deploy-infra.yml'
   workflow_dispatch:
+    inputs:
+      deploy_aci:
+        description: 'Deploy ACI (restarts container in prod)'
+        type: boolean
+        default: true
 
 permissions:
   id-token: write
@@ -24,6 +28,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Azure login
+        if: github.event_name == 'push' || inputs.deploy_aci
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
@@ -31,4 +36,5 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Deploy ACI
+        if: github.event_name == 'push' || inputs.deploy_aci
         run: npm run deploy:aci
