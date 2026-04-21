@@ -1,11 +1,11 @@
-name: Deploy Logic App
+name: Deploy Logic Apps
 
 on:
   push:
     branches: ['main']
     paths:
       - 'infra/logicapp/**'
-      - '.github/workflows/deploy-logicapp.yml'
+      - '.github/workflows/deploy-logicapps.yml'
   workflow_dispatch:
 
 permissions:
@@ -29,5 +29,5 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Deploy Logic App
-        run: npm run deploy:logicapp
+      - name: Deploy Logic Apps
+        run: npm run deploy:logicapps
