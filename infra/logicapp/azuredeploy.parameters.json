@@ -1,0 +1,42 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "logicAppName": {
+      "value": "f1-fantasy-next-race-info-runner"
+    },
+    "location": {
+      "value": "westeurope"
+    },
+    "aciConnectionName": {
+      "value": "aci-1"
+    },
+    "aciConnectionDisplayName": {
+      "value": "aci-connection"
+    },
+    "containerGroupName": {
+      "value": "f1-fantasy-next-race-info-aci"
+    },
+    "containerGroupResourceGroup": {
+      "value": "f1-fantazy-bot"
+    },
+    "containerGroupSubscriptionId": {
+      "value": "5cfc4033-d828-4bdb-b9ea-de042e483715"
+    },
+    "recurrenceFrequency": {
+      "value": "Week"
+    },
+    "recurrenceInterval": {
+      "value": 1
+    },
+    "recurrenceHours": {
+      "value": [0]
+    },
+    "recurrenceWeekDays": {
+      "value": ["Monday"]
+    },
+    "recurrenceTimeZone": {
+      "value": "UTC"
+    }
+  }
+}
