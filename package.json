@@ -9,7 +9,10 @@
     "lint:fix": "eslint . --fix",
     "start": "node index.js",
     "format": "prettier --write .",
-    "deploy:aci": "az deployment group create --resource-group f1-fantazy-bot --name \"next-race-aci-${DEPLOYMENT_SUFFIX:-manual-$(date +%s)}\" --template-file infra/aci/azuredeploy.json --parameters @infra/aci/azuredeploy.parameters.json --output none --only-show-errors"
+    "deploy:aci": "az deployment group create --resource-group f1-fantazy-bot --name \"next-race-aci-${DEPLOYMENT_SUFFIX:-manual-$(date +%s)}\" --template-file infra/aci/azuredeploy.json --parameters @infra/aci/azuredeploy.parameters.json --output none --only-show-errors",
+    "deploy:scheduler": "az deployment group create --resource-group f1-fantazy-bot --name \"next-race-scheduler-${DEPLOYMENT_SUFFIX:-manual-$(date +%s)}\" --template-file infra/scheduler/azuredeploy.json --parameters @infra/scheduler/azuredeploy.parameters.json --output none --only-show-errors",
+    "deploy:grant-runner-msi": "bash scripts/grant-runner-msi.sh",
+    "deploy:logicapps": "npm run deploy:scheduler && npm run deploy:grant-runner-msi"
   },
   "engines": {
     "node": ">=20.0.0"
