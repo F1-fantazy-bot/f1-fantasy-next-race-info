@@ -16,6 +16,14 @@
     },
     "containerGroupName": {
       "value": "f1-fantasy-next-race-info-aci"
+    },
+    "telegramBotToken": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/5cfc4033-d828-4bdb-b9ea-de042e483715/resourceGroups/f1-fantazy-bot/providers/Microsoft.KeyVault/vaults/f1-fantasy-kv"
+        },
+        "secretName": "telegram-bot-token"
+      }
     }
   }
 }
