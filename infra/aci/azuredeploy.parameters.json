@@ -30,7 +30,7 @@
       "value": "f1-fantasy-scraper-json"
     },
     "azureOpenAiModel": {
-      "value": "gpt-5.3-chat"
+      "value": "gpt-5.4"
     },
     "acrPassword": {
       "reference": {

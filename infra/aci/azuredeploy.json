@@ -98,7 +98,7 @@
     },
     "azureOpenAiModel": {
       "type": "string",
-      "defaultValue": "gpt-5-chat",
+      "defaultValue": "gpt-5.4",
       "metadata": {
         "description": "Azure OpenAI deployment/model name."
       }
