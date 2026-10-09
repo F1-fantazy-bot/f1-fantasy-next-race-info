@@ -58,6 +58,8 @@ The application will:
 - Upload the output as `next-race-info.json` to your Azure Blob Storage container
 - Print the formatted JSON to the console
 
+The AI model is pinned to `gpt-6.1-sol` in `src/azureOpenAiService.js`; it has no environment or ARM parameter override.
+
 ## Deploy to Azure Container Instances (ARM)
 
 Use the ARM template in [`infra/aci/azuredeploy.json`](infra/aci/azuredeploy.json) to deploy this container as a one-shot workload in ACI.
@@ -103,7 +105,6 @@ Edit:
 - `acrServer`
 - `acrUsername`
 - `azureStorageContainerName`
-- `azureOpenAiModel` (defaults to `gpt-6.1-sol`)
 - `acrPassword.reference`
 - `azureStorageConnectionString.reference`
 - `telegramBotToken.reference`

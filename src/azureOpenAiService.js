@@ -1,7 +1,7 @@
 const { AzureOpenAI } = require('openai');
 const { HistoricalInformationAboutNextRacePrompt } = require('./prompts');
-const { AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY, AZURE_OPEN_AI_MODEL } =
-  process.env;
+const { AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY } = process.env;
+const AI_MODEL = 'gpt-6.1-sol';
 
 // Module-level variables for client state
 let client = null;
@@ -15,13 +15,9 @@ async function initializeClient() {
   if (initialized) return;
 
   try {
-    if (
-      !AZURE_OPENAI_ENDPOINT ||
-      !AZURE_OPENAI_API_KEY ||
-      !AZURE_OPEN_AI_MODEL
-    ) {
+    if (!AZURE_OPENAI_ENDPOINT || !AZURE_OPENAI_API_KEY) {
       throw new Error(
-        'Missing required environment variables: AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY, AZURE_OPEN_AI_MODEL',
+        'Missing required environment variables: AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY',
       );
     }
 
@@ -29,7 +25,6 @@ async function initializeClient() {
     const options = {
       AZURE_OPENAI_ENDPOINT,
       AZURE_OPENAI_API_KEY,
-      AZURE_OPEN_AI_MODEL,
       apiVersion,
     };
 
@@ -77,11 +72,11 @@ Please provide historical information about this Formula 1 circuit in ${language
     ];
 
     const response = await client.chat.completions.create({
-      model: AZURE_OPEN_AI_MODEL,
+      model: AI_MODEL,
       messages: messages,
     });
 
-    const azureOpenAiTokensString = `Azure OpenAI model - ${AZURE_OPEN_AI_MODEL}, tokens - prompt: ${response.usage.prompt_tokens}, completion: ${response.usage.completion_tokens}, total: ${response.usage.total_tokens}`;
+    const azureOpenAiTokensString = `Azure OpenAI model - ${AI_MODEL}, tokens - prompt: ${response.usage.prompt_tokens}, completion: ${response.usage.completion_tokens}, total: ${response.usage.total_tokens}`;
     console.log(azureOpenAiTokensString);
 
     if (response.choices && response.choices.length > 0) {
