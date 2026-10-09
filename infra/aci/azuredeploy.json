@@ -98,7 +98,7 @@
     },
     "azureOpenAiModel": {
       "type": "string",
-      "defaultValue": "gpt-5.6-terra",
+      "defaultValue": "gpt-6.1-sol",
       "metadata": {
         "description": "Azure OpenAI deployment/model name."
       }
