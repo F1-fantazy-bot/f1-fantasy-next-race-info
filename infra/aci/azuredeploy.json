@@ -95,13 +95,6 @@
       "metadata": {
         "description": "Azure OpenAI API key."
       }
-    },
-    "azureOpenAiModel": {
-      "type": "string",
-      "defaultValue": "gpt-6.1-sol",
-      "metadata": {
-        "description": "Azure OpenAI deployment/model name."
-      }
     }
   },
   "resources": [
@@ -128,10 +121,6 @@
                 {
                   "name": "AZURE_STORAGE_CONTAINER_NAME",
                   "value": "[parameters('azureStorageContainerName')]"
-                },
-                {
-                  "name": "AZURE_OPEN_AI_MODEL",
-                  "value": "[parameters('azureOpenAiModel')]"
                 },
                 {
                   "name": "AZURE_OPENAI_ENDPOINT",
