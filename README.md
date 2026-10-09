@@ -103,7 +103,7 @@ Edit:
 - `acrServer`
 - `acrUsername`
 - `azureStorageContainerName`
-- `azureOpenAiModel`
+- `azureOpenAiModel` (defaults to `gpt-6.1-sol`)
 - `acrPassword.reference`
 - `azureStorageConnectionString.reference`
 - `telegramBotToken.reference`
