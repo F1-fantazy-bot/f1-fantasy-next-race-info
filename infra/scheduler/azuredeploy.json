@@ -63,13 +63,13 @@
             "telegramBotToken": { "type": "SecureString" }
           },
           "triggers": {
-            "Every_Monday": {
+            "Every_Tuesday": {
               "type": "Recurrence",
               "recurrence": {
                 "frequency": "Week",
                 "interval": 1,
                 "schedule": {
-                  "weekDays": ["Monday"],
+                  "weekDays": ["Tuesday"],
                   "hours": [0],
                   "minutes": [0]
                 },
@@ -142,8 +142,16 @@
                 }
               },
               "runAfter": {
-                "Notify_Log_Channel_On_Failure": ["Succeeded", "Failed", "TimedOut"],
-                "Notify_Errors_Channel_On_Failure": ["Succeeded", "Failed", "TimedOut"]
+                "Notify_Log_Channel_On_Failure": [
+                  "Succeeded",
+                  "Failed",
+                  "TimedOut"
+                ],
+                "Notify_Errors_Channel_On_Failure": [
+                  "Succeeded",
+                  "Failed",
+                  "TimedOut"
+                ]
               }
             }
           }

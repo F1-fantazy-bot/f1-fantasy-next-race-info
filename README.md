@@ -141,6 +141,8 @@ az container restart \
   --name <container-group-name>
 ```
 
+The scheduler runs every Tuesday at 00:00 UTC, allowing time for the previous race’s results to reach the upstream API.
+
 ## Azure Blob Storage Integration
 
 - The output JSON is uploaded to Azure Blob Storage using the [`src/azureBlobStorageService.js`](src/azureBlobStorageService.js:1) module.
