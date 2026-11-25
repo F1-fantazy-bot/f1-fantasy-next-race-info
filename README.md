@@ -208,6 +208,28 @@ The mapping includes 30+ races covering:
    https://docs.google.com/spreadsheets/d/1XueNI7ZawEX0RLDq5dAGVqsEb1-DBOK2kUWGwM1OMKs/export?format=csv
    ```
 
+## Jolpica cache refresh
+
+The dedicated refresh container uses the next-race info image with the command
+`node src/refreshJolpica.js`. It writes the full UTC-year calendar to
+`jolpica/calendar.json` and historical race results to
+`jolpica/results/<season>.json` in the `f1-fantasy-scraper-json` container of the `f1fantazybot9eca`
+storage account. It runs Monday at
+12:00 UTC, fills missing seasons from the previous ten years, and refreshes the
+latest completed season. The calendar is published before the results. Failed
+datasets retain their last published blobs and are listed together in one
+Telegram alert. Calendar age alone does not invalidate a blob during an outage.
+
+1. Publish the next-race info image. Run the **Deploy Jolpica refresh** workflow,
+   or run `npm run deploy:jolpica-aci` and `npm run deploy:jolpica-scheduler` in that
+   order. The deployment identity needs permission to assign the scheduler's ACI
+   role. Initial ACI creation may start the refresh.
+2. For a manual refresh, use **Run Trigger → Every_Monday** on
+   `f1-fantasy-jolpica-refresh-scheduler`, or start
+   `f1-fantasy-jolpica-refresh-aci` after the current run exits. Check the ACI exit
+   code and verify that the current-year calendar and all ten result blobs are
+   readable. Repeat a manual run after a midweek schedule change if needed.
+
 ## Application Flow
 
 ```mermaid

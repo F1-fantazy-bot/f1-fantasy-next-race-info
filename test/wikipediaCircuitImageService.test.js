@@ -25,7 +25,7 @@ require.cache[telegramModulePath] = {
   filename: telegramModulePath,
   loaded: true,
   exports: {
-    sendTelegramMessage: async () => {},
+    sendTelegramErrorMessage: async () => {},
   },
 };
 delete require.cache[serviceModulePath];
