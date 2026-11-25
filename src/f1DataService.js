@@ -1,6 +1,6 @@
 // Fetch data from the F1 APIs and generate JSON output
 
-const JOLPI_API_BASE = 'https://api.jolpi.ca/ergast/f1';
+const { readCalendar, readResults } = require('./jolpicaCache');
 const OPENF1_API_BASE = 'https://api.openf1.org';
 const { getTrackHistoricalInfo } = require('./azureOpenAiService');
 const { fetchCircuitImage } = require('./wikipediaCircuitImageService');
@@ -15,38 +15,39 @@ const SUPPORTED_LANGUAGES = [
 ];
 const { getSheetRaceName } = require('./raceNameMapping');
 
-async function fetchNextRaceData() {
+async function fetchNextRaceData(now = new Date()) {
   try {
-    const response = await fetch(`${JOLPI_API_BASE}/current/next.json`);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch next race data: ${response.status}`);
-    }
-    const data = await response.json();
-
-    // Extract the first (and only) race from the Races array
-    const race = data.MRData.RaceTable.Races[0];
+    const races = await readCalendar(now.getUTCFullYear());
+    const race = races
+      .filter(
+        (entry) =>
+          entry.time && Date.parse(`${entry.date}T${entry.time}`) >= now,
+      )
+      .sort((a, b) =>
+        `${a.date}T${a.time}`.localeCompare(`${b.date}T${b.time}`),
+      )[0];
     if (!race) {
       throw new Error('No next race data available');
     }
 
     // Only include sessions that exist
     const sessions = {};
-    if (race.FirstPractice) {
+    if (race.FirstPractice?.date && race.FirstPractice.time) {
       sessions.firstPractice = `${race.FirstPractice.date}T${race.FirstPractice.time}`;
     }
-    if (race.SecondPractice) {
+    if (race.SecondPractice?.date && race.SecondPractice.time) {
       sessions.secondPractice = `${race.SecondPractice.date}T${race.SecondPractice.time}`;
     }
-    if (race.ThirdPractice) {
+    if (race.ThirdPractice?.date && race.ThirdPractice.time) {
       sessions.thirdPractice = `${race.ThirdPractice.date}T${race.ThirdPractice.time}`;
     }
-    if (race.Sprint) {
+    if (race.Sprint?.date && race.Sprint.time) {
       sessions.sprint = `${race.Sprint.date}T${race.Sprint.time}`;
     }
-    if (race.SprintQualifying) {
+    if (race.SprintQualifying?.date && race.SprintQualifying.time) {
       sessions.sprintQualifying = `${race.SprintQualifying.date}T${race.SprintQualifying.time}`;
     }
-    if (race.Qualifying) {
+    if (race.Qualifying?.date && race.Qualifying.time) {
       sessions.qualifying = `${race.Qualifying.date}T${race.Qualifying.time}`;
     }
     sessions.race = `${race.date}T${race.time}`;
@@ -187,24 +188,25 @@ async function fetchOvertakeData(year, sheetRaceName) {
   }
 }
 
-async function fetchHistoricalResults(circuitId) {
+async function fetchHistoricalResults(
+  circuitId,
+  currentYear = new Date().getUTCFullYear(),
+) {
   try {
-    const currentYear = new Date().getFullYear();
     const startYear = currentYear - 10;
     const endYear = currentYear - 1;
     const results = [];
 
+    // Validate every season before making requests to the enrichment sources.
+    const seasons = await Promise.all(
+      Array.from({ length: endYear - startYear + 1 }, (_, i) =>
+        readResults(startYear + i),
+      ),
+    );
     for (let year = startYear; year <= endYear; year++) {
-      const response = await fetch(
-        `${JOLPI_API_BASE}/${year}/circuits/${circuitId}/results.json`,
+      const race = seasons[year - startYear].find(
+        (entry) => entry.Circuit.circuitId === circuitId,
       );
-      if (!response.ok) {
-        console.warn(`No data available for ${year}`);
-        continue;
-      }
-
-      const data = await response.json();
-      const race = data.MRData.RaceTable.Races[0];
 
       if (race && race.Results && race.Results.length > 0) {
         // Get the winner (first position)
@@ -214,8 +216,10 @@ async function fetchHistoricalResults(circuitId) {
 
         // Get pole position (driver with grid position "1")
         const poleSitter = race.Results.find((result) => result.grid === '1');
-        const polePosition = `${poleSitter.Driver.givenName} ${poleSitter.Driver.familyName}`;
-        const poleConstructor = poleSitter.Constructor.name;
+        const polePosition = poleSitter
+          ? `${poleSitter.Driver.givenName} ${poleSitter.Driver.familyName}`
+          : null;
+        const poleConstructor = poleSitter?.Constructor.name ?? null;
 
         // Get 2nd place finisher
         const secondPlace = race.Results[1];
@@ -310,6 +314,7 @@ async function fetchAllF1Data() {
   const nextRaceData = await fetchNextRaceData();
   const historicalRaceStats = await fetchHistoricalResults(
     nextRaceData.circuitId,
+    nextRaceData.season,
   );
 
   // Get track historical information using Azure OpenAI

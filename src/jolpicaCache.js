@@ -1,3 +1,5 @@
+const { readJsonFromBlob } = require('./azureBlobStorageService');
+
 const CALENDAR_BLOB = 'jolpica/calendar.json';
 const resultsBlob = (year) => `jolpica/results/${year}.json`;
 const SESSION_NAMES = [
@@ -136,6 +138,26 @@ function validateResults(data, year) {
   return races;
 }
 
+function validateFetchedAt(data) {
+  assert(
+    typeof data?.fetchedAt === 'string' &&
+      Number.isFinite(Date.parse(data.fetchedAt)),
+    'Invalid Jolpica cache timestamp',
+  );
+}
+
+async function readCalendar(year) {
+  const data = await readJsonFromBlob(CALENDAR_BLOB);
+  validateFetchedAt(data);
+  return validateCalendar(data, year);
+}
+
+async function readResults(year) {
+  const data = await readJsonFromBlob(resultsBlob(year));
+  validateFetchedAt(data);
+  return validateResults(data, year);
+}
+
 module.exports = {
   CALENDAR_BLOB,
   resultsBlob,
@@ -143,4 +165,6 @@ module.exports = {
   validatePage,
   validateCalendar,
   validateResults,
+  readCalendar,
+  readResults,
 };

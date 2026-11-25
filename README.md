@@ -189,24 +189,16 @@ The mapping includes 30+ races covering:
 - Robust CSV parsing with proper handling of quoted fields
 - Network error resilience with warning logs for debugging
 
-## API Endpoints Used
+## Enrichment data sources
 
-1. Next Race Data:
-   ```
-   https://api.jolpi.ca/ergast/f1/current/next.json
-   ```
-2. Sprint Weekend Check:
-   ```
-   https://api.jolpi.ca/ergast/f1/<season>/<round>/sprint.json
-   ```
-3. Historical Results:
-   ```
-   https://api.jolpi.ca/ergast/f1/{year}/circuits/{circuitId}/results.json
-   ```
-4. Overtake Data:
-   ```
-   https://docs.google.com/spreadsheets/d/1XueNI7ZawEX0RLDq5dAGVqsEb1-DBOK2kUWGwM1OMKs/export?format=csv
-   ```
+The enrichment job selects the earliest upcoming UTC race in the cached
+calendar and looks up its circuit in the ten yearly results blobs. A valid
+season with no matching circuit contributes no row. A missing or invalid
+required blob fails the run and preserves the existing `next-race-info.json`.
+
+Wikimedia provides the circuit image, OpenF1 provides race interruption
+statistics, the overtake spreadsheet provides overtake counts, and Azure OpenAI
+provides track history.
 
 ## Jolpica cache refresh
 
@@ -234,9 +226,9 @@ Telegram alert. Calendar age alone does not invalidate a blob during an outage.
 
 ```mermaid
 graph TD
-    A[Start] --> B[Fetch Next Race Data]
+    A[Start] --> B[Read the cached season calendar]
     B --> C[Check Weekend Format]
-    C --> D[Fetch Historical Results]
+    C --> D[Read cached historical results and enrich]
     D --> E[Combine Data]
     E --> F[Upload to Azure Blob]
     F --> G1[Send Success Notification]
