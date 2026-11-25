@@ -27,6 +27,11 @@ async function uploadJsonToBlob(jsonData, blobName, options) {
   return `Uploaded to Azure Blob Storage: ${blobName}`;
 }
 
+async function readJsonFromBlob(blobName) {
+  const contents = await getBlockBlob(blobName).downloadToBuffer();
+  return JSON.parse(contents.toString('utf8'));
+}
+
 async function readBlobProperties(blobName) {
   try {
     return await getBlockBlob(blobName).getProperties();
@@ -38,4 +43,4 @@ async function readBlobProperties(blobName) {
   }
 }
 
-module.exports = { uploadJsonToBlob, readBlobProperties };
+module.exports = { uploadJsonToBlob, readJsonFromBlob, readBlobProperties };
